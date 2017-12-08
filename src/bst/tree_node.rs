@@ -15,8 +15,10 @@ pub trait ST<K, V> {
     fn new(key: K, val: V) -> TreeNode<K, V>;
     fn size(&self) -> usize;
     fn get(&self, key: K) -> &TreeNode<K, V>;
+    fn get_mut(&mut self, key: K) -> &mut TreeNode<K, V>;
     fn put(&mut self, key: K, val: V);
     fn min(&self) -> &TreeNode<K, V>;
+    fn min_mut(&mut self) -> &mut TreeNode<K, V>;
     fn max(&self) -> &TreeNode<K, V>;
     fn ceiling(&self, key: K) -> &TreeNode<K, V>;
     fn floor(&self, key: K) -> &TreeNode<K, V>;
@@ -65,6 +67,20 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
         }
     }
 
+    fn get_mut(&mut self, key: K) -> &mut Self {
+        match {self} {
+            &mut Some(ref mut node) if key != node.key => {
+                if key < node.key {
+                    node.left.get_mut(key)
+                }
+                else {
+                    node.right.get_mut(key)
+                }
+            },
+            other @ &mut Some(_) | other @ &mut None => other,
+        }
+    }
+
     fn put(&mut self, key: K, val: V) {
         match *self {
             Some(ref mut node) => {
@@ -105,6 +121,15 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
                 }
             },
             None => &self,
+        }
+    }
+
+    fn min_mut(&mut self) -> &mut Self {
+        match {self} {
+            &mut Some(ref mut node) if node.left.is_some() => {
+                node.left.min_mut()
+            },
+            other @ &mut Some(_) | other @ &mut None => other,
         }
     }
 
@@ -249,65 +274,35 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
     }
 
     fn delete(&mut self, key: K) {
-        // TODO: 未更新节点 n 值
-        let tree_node = get_mut(self, key);
-        delete_node(tree_node);
-    }
-}
+        // TODO: 未更新节点n值
 
-fn get_mut<K: PartialOrd, V>(tree_node: &mut TreeNode<K, V>, key: K) -> &mut TreeNode<K, V> {
-    let mut anchor = tree_node;
+        let tree_node = self.get_mut(key);
 
-    loop {
-        match {anchor} {
-            &mut Some(ref mut node) if key != node.key => {
-                anchor = if key < node.key {
-                    &mut node.left
-                }
-                    else {
-                        &mut node.right
+        if let Some(mut boxed_node) = tree_node.take() {
+            match (boxed_node.left.take(), boxed_node.right.take()) {
+                (None, None) => {},
+                (leaf @ Some(_), None) | (None, leaf @ Some(_)) => *tree_node = leaf,
+                (left, right) => {
+                    boxed_node.left = left;
+                    boxed_node.right = right;
+
+                    {
+                        let node = &mut *boxed_node;
+                        let next = node.right.min_mut();
+
+                        mem::swap(&mut node.key, &mut next.as_mut().unwrap().key);
+                        mem::swap(&mut node.val, &mut next.as_mut().unwrap().val);
+
+                        next.delete_min();
                     }
-            },
-            other @ &mut Some(_) | other @ &mut None => return other,
-        }
-    }
-}
 
-fn next_node_mut<K: PartialOrd, V>(tree_node: &mut TreeNode<K, V>) -> &mut TreeNode<K, V> {
-    let mut anchor = tree_node;
-
-    loop {
-        match {anchor} {
-            &mut Some(ref mut node) if node.left.is_some() => anchor = &mut node.left,
-            other @ &mut Some(_) | other @ &mut None => return other
-        }
-    }
-}
-
-fn delete_node<K: PartialOrd, V>(tree_node: &mut TreeNode<K, V>) {
-    if let Some(mut boxed_node) = tree_node.take() {
-        match (boxed_node.left.take(), boxed_node.right.take()) {
-            (None, None) => {},
-            (leaf @ Some(_), None) | (None, leaf @ Some(_)) => *tree_node = leaf,
-            (left, right) => {
-                boxed_node.left = left;
-                boxed_node.right = right;
-
-                {
-                    let node = &mut *boxed_node;
-                    let next = next_node_mut(&mut node.right);
-
-                    mem::swap(&mut node.key, &mut next.as_mut().unwrap().key);
-                    mem::swap(&mut node.val, &mut next.as_mut().unwrap().val);
-
-                    delete_node(next);
+                    *tree_node = Some(boxed_node)
                 }
-
-                *tree_node = Some(boxed_node)
             }
         }
     }
 }
+
 
 #[test]
 fn test() {
