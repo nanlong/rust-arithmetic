@@ -1,6 +1,8 @@
+use std::mem;
+
 pub type TreeNode<K, V> = Option<Box<Node<K, V>>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Node<K, V> {
     pub key: K,
     pub val: V,
@@ -22,6 +24,7 @@ pub trait ST<K, V> {
     fn rank(&self, key: K) -> usize;
     fn delete_min(&mut self);
     fn delete_max(&mut self);
+    fn delete(&mut self, key: K);
 }
 
 
@@ -244,6 +247,66 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
             *self = self.take().unwrap().left;
         }
     }
+
+    fn delete(&mut self, key: K) {
+        // TODO: 未更新节点 n 值
+        let tree_node = get_mut(self, key);
+        delete_node(tree_node);
+    }
+}
+
+fn get_mut<K: PartialOrd, V>(tree_node: &mut TreeNode<K, V>, key: K) -> &mut TreeNode<K, V> {
+    let mut anchor = tree_node;
+
+    loop {
+        match {anchor} {
+            &mut Some(ref mut node) if key != node.key => {
+                anchor = if key < node.key {
+                    &mut node.left
+                }
+                    else {
+                        &mut node.right
+                    }
+            },
+            other @ &mut Some(_) | other @ &mut None => return other,
+        }
+    }
+}
+
+fn next_node_mut<K: PartialOrd, V>(tree_node: &mut TreeNode<K, V>) -> &mut TreeNode<K, V> {
+    let mut anchor = tree_node;
+
+    loop {
+        match {anchor} {
+            &mut Some(ref mut node) if node.left.is_some() => anchor = &mut node.left,
+            other @ &mut Some(_) | other @ &mut None => return other
+        }
+    }
+}
+
+fn delete_node<K: PartialOrd, V>(tree_node: &mut TreeNode<K, V>) {
+    if let Some(mut boxed_node) = tree_node.take() {
+        match (boxed_node.left.take(), boxed_node.right.take()) {
+            (None, None) => {},
+            (leaf @ Some(_), None) | (None, leaf @ Some(_)) => *tree_node = leaf,
+            (left, right) => {
+                boxed_node.left = left;
+                boxed_node.right = right;
+
+                {
+                    let node = &mut *boxed_node;
+                    let next = next_node_mut(&mut node.right);
+
+                    mem::swap(&mut node.key, &mut next.as_mut().unwrap().key);
+                    mem::swap(&mut node.val, &mut next.as_mut().unwrap().val);
+
+                    delete_node(next);
+                }
+
+                *tree_node = Some(boxed_node)
+            }
+        }
+    }
 }
 
 #[test]
@@ -305,8 +368,14 @@ fn test() {
     tree_node.delete_max();
     assert_eq!(tree_node.size(), 6);
 
-    match * tree_node.max() {
+    match *tree_node.max() {
         Some(ref node) => assert_eq!(node.key, "S"),
         None => assert!(false),
+    }
+
+    tree_node.delete("E");
+    match *tree_node.get("E") {
+        Some(_) => assert!(false),
+        None => assert!(true),
     }
 }
