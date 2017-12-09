@@ -27,6 +27,7 @@ pub trait ST<K, V> {
     fn delete_min(&mut self);
     fn delete_max(&mut self);
     fn delete(&mut self, key: K);
+    fn delete_self(&mut self);
 }
 
 
@@ -274,15 +275,34 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
     }
 
     fn delete(&mut self, key: K) {
-        // TODO: 未更新节点n值
+        let mut is_self = false;
 
-        let tree_node = self.get_mut(key);
+        if let &mut Some(ref mut node) = self {
+            if key < node.key {
+                node.left.delete(key);
+            }
+            else if key > node.key {
+                node.right.delete(key);
+            }
+            else {
+                is_self = true;
+            }
 
-        if let Some(mut boxed_node) = tree_node.take() {
+            node.n = node.left.size() + node.right.size() + 1;
+        }
+
+        if is_self {
+            self.delete_self();
+        }
+    }
+
+    fn delete_self(&mut self) {
+        if let Some(mut boxed_node) = self.take() {
             match (boxed_node.left.take(), boxed_node.right.take()) {
                 (None, None) => {},
-                (leaf @ Some(_), None) | (None, leaf @ Some(_)) => *tree_node = leaf,
+                (leaf @ Some(_), None) | (None, leaf @ Some(_)) => *self = leaf,
                 (left, right) => {
+
                     boxed_node.left = left;
                     boxed_node.right = right;
 
@@ -292,11 +312,11 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
 
                         mem::swap(&mut node.key, &mut next.as_mut().unwrap().key);
                         mem::swap(&mut node.val, &mut next.as_mut().unwrap().val);
-
-                        next.delete_min();
                     }
 
-                    *tree_node = Some(boxed_node)
+                    boxed_node.right.delete_min();
+                    boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
+                    *self = Some(boxed_node)
                 }
             }
         }
@@ -373,4 +393,6 @@ fn test() {
         Some(_) => assert!(false),
         None => assert!(true),
     }
+
+    assert_eq!(tree_node.size(), 5);
 }
