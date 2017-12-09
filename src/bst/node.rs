@@ -2,7 +2,7 @@ use std::mem;
 
 pub type Link<K, V> = Option<Box<Node<K, V>>>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Node<K, V> {
     pub key: K,
     pub val: V,
