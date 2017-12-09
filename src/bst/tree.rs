@@ -52,6 +52,10 @@ impl<K: PartialOrd, V> BST<K, V> {
     pub fn delete_max(&mut self) {
         self.root.delete_max()
     }
+
+    pub fn delete(&mut self, key: K) {
+        self.root.delete(key)
+    }
 }
 
 
@@ -103,4 +107,28 @@ fn test() {
     }
 
     assert_eq!(bst.rank("R"), 5);
+
+    bst.delete_min();
+    assert_eq!(bst.size(), 7);
+
+    match *bst.min() {
+        Some(ref node) => assert_eq!(node.key, "C"),
+        None => assert!(false),
+    }
+
+    bst.delete_max();
+    assert_eq!(bst.size(), 6);
+
+    match *bst.max() {
+        Some(ref node) => assert_eq!(node.key, "S"),
+        None => assert!(false),
+    }
+
+    bst.delete("E");
+    match *bst.get("E") {
+        Some(_) => assert!(false),
+        None => assert!(true),
+    }
+
+    assert_eq!(bst.size(), 5);
 }
