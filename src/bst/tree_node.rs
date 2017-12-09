@@ -52,19 +52,16 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
     }
 
     fn get(&self, key: K) -> &Self {
-        match *self {
-            Some(ref node) => {
+        match {self} {
+            &Some(ref node) if key != node.key => {
                 if key < node.key {
                     node.left.get(key)
                 }
-                else if key > node.key {
+                else {
                     node.right.get(key)
                 }
-                else {
-                    &self
-                }
             },
-            None => &self,
+            node @ &Some(_) | node @ &None => node,
         }
     }
 
@@ -78,7 +75,7 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
                     node.right.get_mut(key)
                 }
             },
-            other @ &mut Some(_) | other @ &mut None => other,
+            node @ &mut Some(_) | node @ &mut None => node,
         }
     }
 
@@ -112,16 +109,11 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
     }
 
     fn min(&self) -> &Self {
-        match *self {
-            Some(ref node) => {
-                if node.left.is_none() {
-                    &self
-                }
-                else {
-                    node.left.min()
-                }
+        match {self} {
+            &Some(ref node) if node.left.is_some() => {
+                node.left.min()
             },
-            None => &self,
+            node @ &Some(_) | node @ &None => node,
         }
     }
 
@@ -135,16 +127,11 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
     }
 
     fn max(&self) -> &Self {
-        match *self {
-            Some(ref node) => {
-                if node.right.is_none() {
-                    &self
-                }
-                else {
-                    node.right.max()
-                }
+        match {self} {
+            &Some(ref node) if node.right.is_some() => {
+                node.right.max()
             },
-            None => &self,
+            node @ &Some(_) | node @ &None => node,
         }
     }
 
