@@ -1,28 +1,28 @@
 use std::mem;
 
-pub type TreeNode<K, V> = Option<Box<Node<K, V>>>;
+pub type Link<K, V> = Option<Box<Node<K, V>>>;
 
 #[derive(Debug, Clone)]
 pub struct Node<K, V> {
     pub key: K,
     pub val: V,
-    left: TreeNode<K, V>,
-    right: TreeNode<K, V>,
+    left: Link<K, V>,
+    right: Link<K, V>,
     n: usize,
 }
 
 pub trait ST<K, V> {
-    fn new(key: K, val: V) -> TreeNode<K, V>;
+    fn new(key: K, val: V) -> Link<K, V>;
     fn size(&self) -> usize;
-    fn get(&self, key: K) -> &TreeNode<K, V>;
-    fn get_mut(&mut self, key: K) -> &mut TreeNode<K, V>;
+    fn get(&self, key: K) -> &Link<K, V>;
+    fn get_mut(&mut self, key: K) -> &mut Link<K, V>;
     fn put(&mut self, key: K, val: V);
-    fn min(&self) -> &TreeNode<K, V>;
-    fn min_mut(&mut self) -> &mut TreeNode<K, V>;
-    fn max(&self) -> &TreeNode<K, V>;
-    fn ceiling(&self, key: K) -> &TreeNode<K, V>;
-    fn floor(&self, key: K) -> &TreeNode<K, V>;
-    fn select(&self, k: usize) -> &TreeNode<K, V>;
+    fn min(&self) -> &Link<K, V>;
+    fn min_mut(&mut self) -> &mut Link<K, V>;
+    fn max(&self) -> &Link<K, V>;
+    fn ceiling(&self, key: K) -> &Link<K, V>;
+    fn floor(&self, key: K) -> &Link<K, V>;
+    fn select(&self, k: usize) -> &Link<K, V>;
     fn rank(&self, key: K) -> usize;
     fn delete_min(&mut self);
     fn delete_max(&mut self);
@@ -31,7 +31,7 @@ pub trait ST<K, V> {
 }
 
 
-impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
+impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
     fn new(key: K, val: V) -> Self {
         let node = Box::new(Node {
             key,
@@ -313,73 +313,73 @@ impl<K: PartialOrd, V> ST<K, V> for TreeNode<K, V> {
 
 #[test]
 fn test() {
-    let mut tree_node = TreeNode::new("S", 1);
-    assert_eq!(tree_node.size(), 1);
+    let mut node = Link::new("S", 1);
+    assert_eq!(node.size(), 1);
 
-    tree_node.put("S", 1);
-    tree_node.put("E", 2);
-    tree_node.put("X", 3);
-    tree_node.put("A", 4);
-    tree_node.put("R", 5);
-    tree_node.put("C", 6);
-    tree_node.put("H", 7);
-    tree_node.put("M", 8);
+    node.put("S", 1);
+    node.put("E", 2);
+    node.put("X", 3);
+    node.put("A", 4);
+    node.put("R", 5);
+    node.put("C", 6);
+    node.put("H", 7);
+    node.put("M", 8);
 
-    assert_eq!(tree_node.size(), 8);
+    assert_eq!(node.size(), 8);
 
-    match *tree_node.get("A") {
+    match *node.get("A") {
         Some(ref node) => assert_eq!(node.val, 4),
         None => assert!(false),
     }
 
-    match *tree_node.min() {
+    match *node.min() {
         Some(ref node) => assert_eq!(node.key, "A"),
         None => assert!(false),
     }
 
-    match *tree_node.max() {
+    match *node.max() {
         Some(ref node) => assert_eq!(node.key, "X"),
         None => assert!(false),
     }
 
-    match *tree_node.ceiling("G") {
+    match *node.ceiling("G") {
         Some(ref node) => assert_eq!(node.key, "H"),
         None => assert!(false),
     }
 
-    match *tree_node.floor("G") {
+    match *node.floor("G") {
         Some(ref node) => assert_eq!(node.key, "E"),
         None => assert!(false),
     }
 
-    match *tree_node.select(5) {
+    match *node.select(5) {
         Some(ref node) => assert_eq!(node.key, "R"),
         None => assert!(false),
     }
 
-    assert_eq!(tree_node.rank("R"), 5);
+    assert_eq!(node.rank("R"), 5);
 
-    tree_node.delete_min();
-    assert_eq!(tree_node.size(), 7);
+    node.delete_min();
+    assert_eq!(node.size(), 7);
 
-    match *tree_node.min() {
+    match *node.min() {
         Some(ref node) => assert_eq!(node.key, "C"),
         None => assert!(false),
     }
 
-    tree_node.delete_max();
-    assert_eq!(tree_node.size(), 6);
+    node.delete_max();
+    assert_eq!(node.size(), 6);
 
-    match *tree_node.max() {
+    match *node.max() {
         Some(ref node) => assert_eq!(node.key, "S"),
         None => assert!(false),
     }
 
-    tree_node.delete("E");
-    match *tree_node.get("E") {
+    node.delete("E");
+    match *node.get("E") {
         Some(_) => assert!(false),
         None => assert!(true),
     }
 
-    assert_eq!(tree_node.size(), 5);
+    assert_eq!(node.size(), 5);
 }

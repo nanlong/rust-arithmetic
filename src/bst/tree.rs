@@ -1,7 +1,7 @@
-use bst::tree_node::{TreeNode, ST};
+use bst::node::{Link, ST};
 
 pub struct BST<K, V> {
-    root: TreeNode<K, V>,
+    root: Link<K, V>,
 }
 
 impl<K: PartialOrd, V> BST<K, V> {
@@ -17,27 +17,27 @@ impl<K: PartialOrd, V> BST<K, V> {
         self.root.put(key, val)
     }
 
-    pub fn get(&self, key: K) -> &TreeNode<K, V> {
+    pub fn get(&self, key: K) -> &Link<K, V> {
         self.root.get(key)
     }
 
-    pub fn min(&self) -> &TreeNode<K, V> {
+    pub fn min(&self) -> &Link<K, V> {
         self.root.min()
     }
 
-    pub fn max(&self) -> &TreeNode<K, V> {
+    pub fn max(&self) -> &Link<K, V> {
         self.root.max()
     }
 
-    pub fn floor(&self, key: K) -> &TreeNode<K, V> {
+    pub fn floor(&self, key: K) -> &Link<K, V> {
         self.root.floor(key)
     }
 
-    pub fn ceiling(&self, key: K) -> &TreeNode<K, V> {
+    pub fn ceiling(&self, key: K) -> &Link<K, V> {
         self.root.ceiling(key)
     }
 
-    pub fn select(&self, k: usize) -> &TreeNode<K, V> {
+    pub fn select(&self, k: usize) -> &Link<K, V> {
         self.root.select(k)
     }
 
