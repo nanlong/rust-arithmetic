@@ -11,6 +11,7 @@ pub enum Colors {
 pub trait ST<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
     fn size(&self) -> usize;
+    fn update_n(&mut self);
     fn is_red(&self) -> bool;
     fn is_empty(&self) -> bool;
     fn left(&self) -> &Link<K, V>;
@@ -60,6 +61,15 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         match *self {
             Some(ref boxed_node) => boxed_node.n,
             None => 0,
+        }
+    }
+
+    fn update_n(&mut self) {
+        match *self {
+            Some(ref mut boxed_node) => {
+                boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
+            },
+            None => {},
         }
     }
 
@@ -120,7 +130,7 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             mem::swap(&mut x.color, &mut boxed_node.color);
             boxed_node.color = Colors::RED;
             x.n = boxed_node.n;
-            boxed_node.n = 1 + boxed_node.left.size() + boxed_node.right.size();
+            boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
 
             x.left = Some(boxed_node);
             *self = Some(x);
@@ -160,8 +170,6 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 else {
                     boxed_node.right.put(key, val);
                 }
-
-                boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
             },
             None => {
                 *self = Link::new(key, val);
@@ -179,6 +187,8 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         if self.left().is_red() && self.right().is_red() {
             self.flip_colors();
         }
+
+        self.update_n();
     }
 
     fn flip_colors_inverse(&mut self) {
@@ -204,12 +214,7 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             self.flip_colors();
         }
 
-        match *self {
-            Some(ref mut boxed_node) => {
-                boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
-            },
-            None => {},
-        }
+        self.update_n();
     }
 
     fn move_red_left(&mut self) {
