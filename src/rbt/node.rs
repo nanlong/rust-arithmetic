@@ -1,4 +1,5 @@
 use std::mem;
+use std::cmp::Ordering;
 
 pub type Link<K, V> = Option<Box<Node<K, V>>>;
 
@@ -31,6 +32,8 @@ pub trait ST<K, V> {
     fn delete_min(&mut self);
     fn move_red_right(&mut self);
     fn delete_max(&mut self);
+    fn compare(&self, key: &K) -> Option<Ordering>;
+    fn delete(&mut self, key: K);
 }
 
 #[derive(Debug)]
@@ -263,6 +266,64 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         }
 
         self.right_mut().delete_max();
+        self.balance();
+    }
+
+    fn compare(&self, key: &K) -> Option<Ordering> {
+        match *self {
+            Some(ref boxed_node) => {
+                if key < &boxed_node.key {
+                    Some(Ordering::Less)
+                }
+                else if key > &boxed_node.key {
+                    Some(Ordering::Greater)
+                }
+                else {
+                    Some(Ordering::Equal)
+                }
+            },
+            None => None,
+        }
+    }
+
+    fn delete(&mut self, key: K) {
+        match self.compare(&key) {
+            Some(Ordering::Less) => {
+                if ! self.left().is_red() && ! self.left().left().is_red() {
+                    self.move_red_left();
+                }
+
+                self.left_mut().delete(key);
+            },
+            result @ Some(_) => {
+                if self.left().is_red() {
+                    self.rotate_right();
+                }
+
+                if let Some(Ordering::Equal) = result {
+                    if self.right().is_none() {
+                        *self = None;
+                        return
+                    }
+                }
+
+                if ! self.right().is_red() && ! self.right().left().is_red() {
+                    self.move_red_right();
+                }
+
+                if let Some(Ordering::Equal) = result {
+                    // TODO
+                    // self.key = self.right().min().key;
+                    // self.val = self.right().min().val;
+                    // self.right_mut().delete_min();
+                }
+                else {
+                    self.right_mut().delete(key);
+                }
+            },
+            None => {},
+        }
+
         self.balance();
     }
 }

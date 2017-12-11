@@ -38,4 +38,16 @@ impl<K: PartialOrd, V> RBT<K, V> {
             self.root.change_black();
         }
     }
+
+    pub fn delete(&mut self, key: K) {
+        if ! self.root.left().is_red() && ! self.root.right().is_red() {
+            self.root.change_red();
+        }
+
+        self.root.delete(key);
+
+        if ! self.root.is_empty() {
+            self.root.change_black();
+        }
+    }
 }
