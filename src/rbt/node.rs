@@ -12,6 +12,7 @@ pub trait ST<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
     fn size(&self) -> usize;
     fn is_red(&self) -> bool;
+    fn is_empty(&self) -> bool;
     fn left(&self) -> &Link<K, V>;
     fn left_mut(&mut self) -> &mut Link<K, V>;
     fn right(&self) -> &Link<K, V>;
@@ -72,6 +73,10 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             },
             None => false,
         }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.size() <= 0
     }
 
     fn left(&self) -> &Link<K, V> {

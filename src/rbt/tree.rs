@@ -22,7 +22,7 @@ impl<K: PartialOrd, V> RBT<K, V> {
 
         self.root.delete_min();
 
-        if self.root.size() > 0 {
+        if ! self.root.is_empty() {
             self.root.change_black();
         }
     }
@@ -34,7 +34,7 @@ impl<K: PartialOrd, V> RBT<K, V> {
 
         self.root.delete_max();
 
-        if self.root.size() > 0 {
+        if ! self.root.is_empty() {
             self.root.change_black();
         }
     }
