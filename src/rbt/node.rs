@@ -19,16 +19,19 @@ pub trait ST<K, V> {
     fn rotate_right(&mut self);
     fn flip_colors(&mut self);
     fn put(&mut self, key: K, val: V);
+    fn flip_colors_inverse(&mut self);
+    fn move_red_left(&mut self);
+    fn delete_min(&mut self);
 }
 
 #[derive(Debug)]
 pub struct Node<K, V> {
-    key: K,
-    val: V,
-    n: usize,
-    color: Colors,
-    left: Link<K, V>,
-    right: Link<K, V>,
+    pub key: K,
+    pub val: V,
+    pub n: usize,
+    pub color: Colors,
+    pub left: Link<K, V>,
+    pub right: Link<K, V>,
 }
 
 impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
@@ -147,6 +150,57 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
 
         if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
             self.flip_colors();
+        }
+    }
+
+    fn flip_colors_inverse(&mut self) {
+        self.change_black();
+        self.as_mut().unwrap().left.change_red();
+        self.as_mut().unwrap().right.change_red();
+    }
+
+    fn move_red_left(&mut self) {
+        self.flip_colors_inverse();
+
+        if self.as_mut().unwrap().right.as_mut().unwrap().left.is_red() {
+            self.as_mut().unwrap().right.rotate_right();
+            self.rotate_left();
+        }
+    }
+
+    fn delete_min(&mut self) {
+        if self.as_ref().unwrap().left.is_none() {
+            *self = None;
+            return
+        }
+
+        if ! self.as_ref().unwrap().left.is_red() && ! self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
+            self.move_red_left();
+        }
+
+        self.as_mut().unwrap().left.delete_min();
+
+        if self.as_ref().unwrap().right.is_red() {
+            self.rotate_left();
+        }
+
+        if ! self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
+            self.rotate_left();
+        }
+
+        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
+            self.rotate_right();
+        }
+
+        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
+            self.flip_colors();
+        }
+
+        match *self {
+            Some(ref mut boxed_node) => {
+                boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
+            },
+            None => {},
         }
     }
 }
