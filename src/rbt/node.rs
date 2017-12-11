@@ -159,6 +159,8 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 else {
                     boxed_node.right.put(key, val);
                 }
+
+                boxed_node.n = boxed_node.left.size() + boxed_node.right.size() + 1;
             },
             None => {
                 *self = Link::new(key, val);

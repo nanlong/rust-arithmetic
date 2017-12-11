@@ -9,9 +9,8 @@ fn main() {
     rbt.put("B", 2);
     rbt.put("A", 1);
     rbt.put("D", 4);
+    rbt.put("E", 5);
+    rbt.put("F", 6);
 
     println!("{:#?}", rbt);
-
-//    node.rotate_right();
-//    println!("{:#?}", node);
 }
