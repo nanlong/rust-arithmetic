@@ -12,6 +12,7 @@ pub enum Colors {
 pub trait ST<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
     fn size(&self) -> usize;
+    fn key(&self) -> Option<&K>;
     fn update_n(&mut self);
     fn is_red(&self) -> bool;
     fn is_empty(&self) -> bool;
@@ -19,6 +20,7 @@ pub trait ST<K, V> {
     fn left_mut(&mut self) -> &mut Link<K, V>;
     fn right(&self) -> &Link<K, V>;
     fn right_mut(&mut self) -> &mut Link<K, V>;
+    fn min_mut(&mut self) -> &mut Link<K, V>;
     fn change_color(&mut self, color: Colors);
     fn change_red(&mut self);
     fn change_black(&mut self);
@@ -34,6 +36,7 @@ pub trait ST<K, V> {
     fn delete_max(&mut self);
     fn compare(&self, key: &K) -> Option<Ordering>;
     fn delete(&mut self, key: K);
+
 }
 
 #[derive(Debug)]
@@ -67,6 +70,13 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         }
     }
 
+    fn key(&self) -> Option<&K> {
+        match *self {
+            Some(ref boxed_node) => Some(&boxed_node.key),
+            None => None,
+        }
+    }
+
     fn update_n(&mut self) {
         match *self {
             Some(ref mut boxed_node) => {
@@ -92,20 +102,29 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         self.size() <= 0
     }
 
-    fn left(&self) -> &Link<K, V> {
+    fn left(&self) -> &Self {
         &self.as_ref().unwrap().left
     }
 
-    fn left_mut(&mut self) -> &mut Link<K, V> {
+    fn left_mut(&mut self) -> &mut Self {
         &mut self.as_mut().unwrap().left
     }
 
-    fn right(&self) -> &Link<K, V> {
+    fn right(&self) -> &Self {
         &self.as_ref().unwrap().right
     }
 
-    fn right_mut(&mut self) -> &mut Link<K, V> {
+    fn right_mut(&mut self) -> &mut Self {
         &mut self.as_mut().unwrap().right
+    }
+
+    fn min_mut(&mut self) -> &mut Self {
+        match {self} {
+            &mut Some(ref mut node) if node.left.is_some() => {
+                node.left.min_mut()
+            },
+            node @ &mut Some(_) | node @ &mut None => node,
+        }
     }
 
     fn change_color(&mut self, color: Colors) {
@@ -311,11 +330,20 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                     self.move_red_right();
                 }
 
+                // TODO: 不正确
                 if let Some(Ordering::Equal) = result {
-                    // TODO
-                    // self.key = self.right().min().key;
-                    // self.val = self.right().min().val;
-                    // self.right_mut().delete_min();
+                    if let Some(mut boxed_node) = self.take() {
+                        {
+                            let node = &mut *boxed_node;
+
+                            mem::swap(&mut node.key, &mut next.as_mut().unwrap().key);
+                            mem::swap(&mut node.val, &mut next.as_mut().unwrap().val);
+                            mem::swap(&mut node.n, &mut next.as_mut().unwrap().n);
+                        }
+
+                        boxed_node.right.delete_min();
+                        *self = Some(boxed_node);
+                    }
                 }
                 else {
                     self.right_mut().delete(key);
