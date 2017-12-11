@@ -1,4 +1,4 @@
-use rbt::node::{Link, ST, Colors};
+use rbt::node::{Link, ST};
 
 #[derive(Debug)]
 pub struct RBT<K, V> {
@@ -16,10 +16,8 @@ impl<K: PartialOrd, V> RBT<K, V> {
     }
 
     pub fn delete_min(&mut self) {
-        if let Some(ref mut boxed_node) = self.root {
-            if ! boxed_node.left.is_red() && ! boxed_node.right.is_red() {
-                boxed_node.color = Colors::RED;
-            }
+        if ! self.root.left().is_red() && ! self.root.right().is_red() {
+            self.root.change_red();
         }
 
         self.root.delete_min();
@@ -30,10 +28,8 @@ impl<K: PartialOrd, V> RBT<K, V> {
     }
 
     pub fn delete_max(&mut self) {
-        if let Some(ref mut boxed_node) = self.root {
-            if ! boxed_node.left.is_red() && ! boxed_node.right.is_red() {
-                boxed_node.color = Colors::RED;
-            }
+        if ! self.root.left().is_red() && ! self.root.right().is_red() {
+            self.root.change_red();
         }
 
         self.root.delete_max();

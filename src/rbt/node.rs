@@ -12,6 +12,10 @@ pub trait ST<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
     fn size(&self) -> usize;
     fn is_red(&self) -> bool;
+    fn left(&self) -> &Link<K, V>;
+    fn left_mut(&mut self) -> &mut Link<K, V>;
+    fn right(&self) -> &Link<K, V>;
+    fn right_mut(&mut self) -> &mut Link<K, V>;
     fn change_color(&mut self, color: Colors);
     fn change_red(&mut self);
     fn change_black(&mut self);
@@ -68,6 +72,22 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             },
             None => false,
         }
+    }
+
+    fn left(&self) -> &Link<K, V> {
+        &self.as_ref().unwrap().left
+    }
+
+    fn left_mut(&mut self) -> &mut Link<K, V> {
+        &mut self.as_mut().unwrap().left
+    }
+
+    fn right(&self) -> &Link<K, V> {
+        &self.as_ref().unwrap().right
+    }
+
+    fn right_mut(&mut self) -> &mut Link<K, V> {
+        &mut self.as_mut().unwrap().right
     }
 
     fn change_color(&mut self, color: Colors) {
@@ -143,15 +163,15 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             }
         }
 
-        if ! self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
+        if ! self.left().is_red() && self.right().is_red() {
             self.rotate_left();
         }
 
-        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
+        if self.left().is_red() && self.left().left().is_red() {
             self.rotate_right();
         }
 
-        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
+        if self.left().is_red() && self.right().is_red() {
             self.flip_colors();
         }
     }
@@ -163,19 +183,19 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
     }
 
     fn balance(&mut self) {
-        if self.as_ref().unwrap().right.is_red() {
+        if self.right().is_red() {
             self.rotate_left();
         }
 
-        if ! self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
+        if ! self.left().is_red() && self.right().is_red() {
             self.rotate_left();
         }
 
-        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
+        if self.left().is_red() && self.left().left().is_red() {
             self.rotate_right();
         }
 
-        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
+        if self.left().is_red() && self.right().is_red() {
             self.flip_colors();
         }
 
@@ -190,49 +210,49 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
     fn move_red_left(&mut self) {
         self.flip_colors_inverse();
 
-        if self.as_mut().unwrap().right.as_mut().unwrap().left.is_red() {
-            self.as_mut().unwrap().right.rotate_right();
+        if self.right().left().is_red() {
+            self.right_mut().rotate_right();
             self.rotate_left();
         }
     }
 
     fn delete_min(&mut self) {
-        if self.as_ref().unwrap().left.is_none() {
+        if self.left().is_none() {
             *self = None;
             return
         }
 
-        if ! self.as_ref().unwrap().left.is_red() && ! self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
+        if ! self.left().is_red() && ! self.left().left().is_red() {
             self.move_red_left();
         }
 
-        self.as_mut().unwrap().left.delete_min();
+        self.left_mut().delete_min();
         self.balance();
     }
 
     fn move_red_right(&mut self) {
         self.flip_colors_inverse();
 
-        if ! self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
+        if ! self.left().left().is_red() {
             self.rotate_right();
         }
     }
 
     fn delete_max(&mut self) {
-        if self.as_ref().unwrap().left.is_red() {
+        if self.left().is_red() {
             self.rotate_right();
         }
 
-        if self.as_ref().unwrap().right.is_none() {
+        if self.right().is_none() {
             *self = None;
             return
         }
 
-        if ! self.as_ref().unwrap().right.is_red() && ! self.as_ref().unwrap().right.as_ref().unwrap().left.is_red() {
+        if ! self.right().is_red() && ! self.right().left().is_red() {
             self.move_red_right();
         }
 
-        self.as_mut().unwrap().right.delete_max();
+        self.right_mut().delete_max();
         self.balance();
     }
 }
