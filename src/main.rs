@@ -12,13 +12,11 @@ fn main() {
     rbt.put("E", 5);
     rbt.put("F", 6);
 
-//    println!("{:#?}", rbt);
-
-    rbt.delete_min();
-
     println!("{:#?}", rbt);
 
     rbt.delete_min();
+    println!("{:#?}", rbt);
 
+    rbt.delete_max();
     println!("{:#?}", rbt);
 }

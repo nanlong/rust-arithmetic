@@ -28,4 +28,18 @@ impl<K: PartialOrd, V> RBT<K, V> {
             self.root.change_black();
         }
     }
+
+    pub fn delete_max(&mut self) {
+        if let Some(ref mut boxed_node) = self.root {
+            if ! boxed_node.left.is_red() && ! boxed_node.right.is_red() {
+                boxed_node.color = Colors::RED;
+            }
+        }
+
+        self.root.delete_max();
+
+        if self.root.size() > 0 {
+            self.root.change_black();
+        }
+    }
 }
