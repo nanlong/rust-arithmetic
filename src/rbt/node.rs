@@ -10,18 +10,15 @@ pub enum Colors {
 
 pub trait ST<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
+    fn size(&self) -> usize;
     fn is_red(&self) -> bool;
     fn change_color(&mut self, color: Colors);
     fn change_red(&mut self);
     fn change_black(&mut self);
-    fn put(&mut self, key: K, val: V);
-    fn size(&self) -> usize;
     fn rotate_left(&mut self);
     fn rotate_right(&mut self);
     fn flip_colors(&mut self);
-    fn is_rotate_left(&self) -> bool;
-    fn is_rotate_right(&self) -> bool;
-    fn is_flip_colors(&self) -> bool;
+    fn put(&mut self, key: K, val: V);
 }
 
 #[derive(Debug)]
@@ -46,6 +43,13 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         });
 
         Some(boxed_node)
+    }
+
+    fn size(&self) -> usize {
+        match *self {
+            Some(ref boxed_node) => boxed_node.n,
+            None => 0,
+        }
     }
 
     fn is_red(&self) -> bool {
@@ -75,13 +79,6 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
 
     fn change_black(&mut self) {
         self.change_color(Colors::BLACK);
-    }
-
-    fn size(&self) -> usize {
-        match *self {
-            Some(ref boxed_node) => boxed_node.n,
-            None => 0,
-        }
     }
 
     fn rotate_left(&mut self) {
@@ -120,33 +117,6 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         self.as_mut().unwrap().right.change_black();
     }
 
-    fn is_rotate_left(&self) -> bool {
-        match *self {
-            Some(ref boxed_node) => {
-                ! boxed_node.left.is_red() && boxed_node.right.is_red()
-            },
-            None => false,
-        }
-    }
-
-    fn is_rotate_right(&self) -> bool {
-        match *self {
-            Some(ref boxed_node) => {
-                boxed_node.left.is_red() && boxed_node.left.as_ref().unwrap().left.is_red()
-            },
-            None => false,
-        }
-    }
-
-    fn is_flip_colors(&self) -> bool {
-        match *self {
-            Some(ref boxed_node) => {
-                boxed_node.left.is_red() && boxed_node.right.is_red()
-            },
-            None => false,
-        }
-    }
-
     fn put(&mut self, key: K, val: V) {
         match *self {
             Some(ref mut boxed_node) if key == boxed_node.key => {
@@ -167,15 +137,15 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             }
         }
 
-        if self.is_rotate_left() {
+        if ! self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
             self.rotate_left();
         }
 
-        if self.is_rotate_right() {
+        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().left.as_ref().unwrap().left.is_red() {
             self.rotate_right();
         }
 
-        if self.is_flip_colors() {
+        if self.as_ref().unwrap().left.is_red() && self.as_ref().unwrap().right.is_red() {
             self.flip_colors();
         }
     }
