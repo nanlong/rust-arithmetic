@@ -10,9 +10,17 @@ impl<K: PartialOrd, V> RBT<K, V> {
         RBT { root: None }
     }
 
+    pub fn get(&self, key: K) -> &Link<K, V> {
+        self.root.get(key)
+    }
+
     pub fn put(&mut self, key: K, val: V) {
         self.root.put(key, val);
         self.root.change_black();
+    }
+
+    pub fn size(&self) -> usize {
+        self.root.size()
     }
 
     pub fn delete_min(&mut self) {
@@ -50,4 +58,34 @@ impl<K: PartialOrd, V> RBT<K, V> {
             self.root.change_black();
         }
     }
+}
+
+#[test]
+fn test() {
+    let mut rbt = RBT::<&str, isize>::new();
+
+    rbt.put("S", 1);
+    rbt.put("E", 2);
+    rbt.put("X", 3);
+    rbt.put("A", 4);
+    rbt.put("R", 5);
+    rbt.put("C", 6);
+    rbt.put("H", 7);
+    rbt.put("M", 8);
+
+    rbt.delete_min();
+    assert!(rbt.get("A").is_none());
+    assert_eq!(rbt.size(), 7);
+
+    rbt.delete_max();
+    assert!(rbt.get("X").is_none());
+    assert_eq!(rbt.size(), 6);
+
+    rbt.delete("S");
+    assert!(rbt.get("S").is_none());
+    assert_eq!(rbt.size(), 5);
+
+    rbt.delete("C");
+    assert!(rbt.get("C").is_none());
+    assert_eq!(rbt.size(), 4);
 }

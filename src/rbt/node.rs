@@ -11,8 +11,8 @@ pub enum Colors {
 
 pub trait ST<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
+    fn get(&self, key: K) -> &Link<K, V>;
     fn size(&self) -> usize;
-    fn key(&self) -> Option<&K>;
     fn update_n(&mut self);
     fn is_red(&self) -> bool;
     fn is_empty(&self) -> bool;
@@ -36,7 +36,6 @@ pub trait ST<K, V> {
     fn delete_max(&mut self);
     fn compare(&self, key: &K) -> Option<Ordering>;
     fn delete(&mut self, key: K);
-
 }
 
 #[derive(Debug)]
@@ -63,17 +62,27 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
         Some(boxed_node)
     }
 
+    fn get(&self, key: K) -> &Self {
+        match {self} {
+            &Some(ref boxed_node) => {
+                if key < boxed_node.key {
+                    boxed_node.left.get(key)
+                }
+                else if key > boxed_node.key {
+                    boxed_node.right.get(key)
+                }
+                else {
+                    &self
+                }
+            },
+            other => &other,
+        }
+    }
+
     fn size(&self) -> usize {
         match *self {
             Some(ref boxed_node) => boxed_node.n,
             None => 0,
-        }
-    }
-
-    fn key(&self) -> Option<&K> {
-        match *self {
-            Some(ref boxed_node) => Some(&boxed_node.key),
-            None => None,
         }
     }
 
@@ -314,12 +323,12 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
 
                 self.left_mut().delete(key);
             },
-            result @ Some(_) => {
+            Some(_) => {
                 if self.left().is_red() {
                     self.rotate_right();
                 }
 
-                if let Some(Ordering::Equal) = result {
+                if let Some(Ordering::Equal) = self.compare(&key) {
                     if self.right().is_none() {
                         *self = None;
                         return
@@ -330,11 +339,11 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                     self.move_red_right();
                 }
 
-                // TODO: 不正确
-                if let Some(Ordering::Equal) = result {
+                if let Some(Ordering::Equal) = self.compare(&key) {
                     if let Some(mut boxed_node) = self.take() {
                         {
                             let node = &mut *boxed_node;
+                            let next = node.right.min_mut();
 
                             mem::swap(&mut node.key, &mut next.as_mut().unwrap().key);
                             mem::swap(&mut node.val, &mut next.as_mut().unwrap().val);
@@ -360,11 +369,5 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
 #[test]
 fn test() {
     let mut tree_node = Link::new("A", 1);
-    assert_eq!(tree_node.is_red(), true);
-
-    tree_node.change_black();
-    assert_eq!(tree_node.is_red(), false);
-
-    tree_node.change_red();
     assert_eq!(tree_node.is_red(), true);
 }
