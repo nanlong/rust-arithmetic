@@ -27,6 +27,7 @@ trait LinkMethods<K, V> {
     fn delete_min(&mut self);
     fn delete_max(&mut self);
     fn size(&self) -> usize;
+    fn update_size(&mut self);
     fn is_red(&self) -> bool;
     fn left(&self) -> &Link<K, V>;
     fn left_mut(&mut self) -> &mut Link<K, V>;
@@ -125,10 +126,6 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
             None => {},
         }
 
-        if self.right().is_red() {
-            self.rotate_left();
-        }
-
         self.balance();
     }
 
@@ -143,10 +140,6 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         }
 
         self.left_mut().delete_min();
-
-        if self.right().is_red() {
-            self.rotate_left();
-        }
 
         self.balance();
     }
@@ -167,10 +160,6 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
 
         self.right_mut().delete_max();
 
-        if self.right().is_red() {
-            self.rotate_left();
-        }
-
         self.balance();
     }
 
@@ -179,6 +168,12 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
             Some(ref boxed_node) => boxed_node.n,
             None => 0,
         }
+    }
+
+    fn update_size(&mut self) {
+        self.as_mut().map(|node| {
+            node.n = node.left.size() + node.right.size() + 1;
+        });
     }
 
     fn is_red(&self) -> bool {
@@ -251,8 +246,9 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         h.as_mut().map(|node| {
             node.color = Colors::RED;
             node.right = x.left_mut().take();
-            node.n = node.left.size() + node.right.size() + 1;
         });
+
+        h.update_size();
 
         x.as_mut().map(|node| node.left = h);
 
@@ -274,8 +270,9 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         h.as_mut().map(|node| {
             node.color = Colors::RED;
             node.left = x.right_mut().take();
-            node.n = node.left.size() + node.right.size() + 1;
         });
+
+        h.update_size();
 
         x.as_mut().map(|node| node.right = h);
 
@@ -283,10 +280,17 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn flip_colors(&mut self) {
+        let exchange_color : fn(&mut Box<Node<K, V>>) = |node| {
+            node.color = match &node.color {
+                &Colors::RED => Colors::BLACK,
+                &Colors::BLACK => Colors::RED,
+            };
+        };
+
         self.as_mut().map(|node| {
-            node.color = Colors::RED;
-            node.left.as_mut().map(|node| node.color = Colors::BLACK);
-            node.right.as_mut().map(|node| node.color = Colors::BLACK);
+            exchange_color(node);
+            node.left.as_mut().map(exchange_color);
+            node.right.as_mut().map(exchange_color);
         });
     }
 
@@ -303,9 +307,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
             self.flip_colors();
         }
 
-        self.as_mut().map(|node| {
-            node.n = node.left.size() + node.right.size() + 1;
-        });
+        self.update_size();
     }
 
     fn compare_key(&self, key: &K) -> Option<Ordering> {
@@ -326,11 +328,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn move_red_left(&mut self) {
-        self.as_mut().map(|node| {
-            node.color = Colors::BLACK;
-            node.left.as_mut().map(|node| node.color = Colors::RED);
-            node.right.as_mut().map(|node| node.color = Colors::RED);
-        });
+        self.flip_colors();
 
         if self.right().left().is_red() {
             self.right_mut().rotate_left();
@@ -339,11 +337,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn move_red_right(&mut self) {
-        self.as_mut().map(|node| {
-            node.color = Colors::BLACK;
-            node.left.as_mut().map(|node| node.color = Colors::RED);
-            node.right.as_mut().map(|node| node.color = Colors::RED);
-        });
+        self.flip_colors();
 
         if self.left().left().is_red() {
             self.rotate_right();
