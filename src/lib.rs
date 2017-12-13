@@ -1,3 +1,3 @@
 // 算法（第四版）练习
 pub mod bst;
-pub mod rbt;
+pub mod red_black_bst;
