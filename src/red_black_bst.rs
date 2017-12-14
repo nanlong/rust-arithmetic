@@ -43,6 +43,8 @@ trait LinkMethods<K, V> {
     fn compare_key(key: &K, link: &Link<K, V>) -> Option<Ordering>;
     fn move_red_left(&mut self);
     fn move_red_right(&mut self);
+    fn select(&self, k: usize) -> &Link<K, V>;
+    fn rank(&self, key: K) -> usize;
 }
 
 impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
@@ -343,6 +345,31 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
             self.rotate_right();
         }
     }
+
+    fn select(&self, k: usize) -> &Self {
+        match {self} {
+            &Some(ref boxed_node) if boxed_node.left.size() != k => {
+                let t = boxed_node.left.size();
+
+                if k < t {
+                    boxed_node.left.select(k)
+                }
+                else {
+                    boxed_node.right.select(k - t - 1)
+                }
+            },
+            link @ &Some(_) | link @ &None => link,
+        }
+    }
+
+    fn rank(&self, key: K) -> usize {
+        match Self::compare_key(&key, &self) {
+            Some(Ordering::Less) => self.left().rank(key),
+            Some(Ordering::Greater) => self.left().size() + self.right().rank(key) + 1,
+            Some(Ordering::Equal) => self.left().size(),
+            None => 0,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -410,13 +437,21 @@ impl<K: PartialOrd, V> RedBlackBST<K, V> {
     pub fn max(&self) -> &Link<K, V> {
         self.root.max()
     }
+
+    pub fn select(&self, k: usize) -> &Link<K, V> {
+        self.root.select(k)
+    }
+
+    pub fn rank(&self, key: K) -> usize {
+        self.root.rank(key)
+    }
 }
 
 
 #[test]
 fn test() {
     let mut tree = RedBlackBST::<&str, isize>::new();
-
+    // A C E H M R S X
     tree.put("S", 1);
     tree.put("E", 2);
     tree.put("X", 3);
@@ -429,16 +464,37 @@ fn test() {
     assert_eq!(tree.min().as_ref().unwrap().key, "A");
     assert_eq!(tree.max().as_ref().unwrap().key, "X");
 
+    assert_eq!(tree.select(0).as_ref().unwrap().key, "A");
+    assert_eq!(tree.select(1).as_ref().unwrap().key, "C");
+    assert_eq!(tree.select(2).as_ref().unwrap().key, "E");
+    assert_eq!(tree.select(3).as_ref().unwrap().key, "H");
+    assert_eq!(tree.select(4).as_ref().unwrap().key, "M");
+    assert_eq!(tree.select(5).as_ref().unwrap().key, "R");
+    assert_eq!(tree.select(6).as_ref().unwrap().key, "S");
+    assert_eq!(tree.select(7).as_ref().unwrap().key, "X");
+    assert!(tree.select(8).is_none());
+
+    assert_eq!(tree.rank("A"), 0);
+    assert_eq!(tree.rank("C"), 1);
+    assert_eq!(tree.rank("E"), 2);
+    assert_eq!(tree.rank("H"), 3);
+    assert_eq!(tree.rank("M"), 4);
+    assert_eq!(tree.rank("R"), 5);
+    assert_eq!(tree.rank("S"), 6);
+    assert_eq!(tree.rank("X"), 7);
+
     assert_eq!(tree.size(), 8);
     assert!(tree.get("S").is_some());
 
     tree.delete_min();
     assert_eq!(tree.size(), 7);
     assert!(tree.get("A").is_none());
+    assert_eq!(tree.select(0).as_ref().unwrap().key, "C");
 
     tree.delete_max();
     assert_eq!(tree.size(), 6);
     assert!(tree.get("X").is_none());
+    assert_eq!(tree.select(5).as_ref().unwrap().key, "S");
 
     tree.delete("S");
     assert_eq!(tree.size(), 5);
