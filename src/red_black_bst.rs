@@ -386,7 +386,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
                     node
                 }
             },
-            Some(Ordering::Equal) | None => &self,
+            Some(Ordering::Equal) | None => &None,
         }
     }
 
@@ -402,7 +402,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
                 }
             },
             Some(Ordering::Greater) => self.right().ceiling(key),
-            Some(Ordering::Equal) | None => &self,
+            Some(Ordering::Equal) | None => &None,
         }
     }
 }
@@ -506,6 +506,8 @@ fn test() {
 
     assert_eq!(tree.floor("J").as_ref().unwrap().key, "H");
     assert_eq!(tree.ceiling("J").as_ref().unwrap().key, "M");
+    assert_eq!(tree.floor("R").as_ref().unwrap().key, "M");
+    assert_eq!(tree.ceiling("R").as_ref().unwrap().key, "S");
 
     assert_eq!(tree.min().as_ref().unwrap().key, "A");
     assert_eq!(tree.max().as_ref().unwrap().key, "X");
