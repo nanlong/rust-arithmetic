@@ -40,7 +40,7 @@ trait LinkMethods<K, V> {
     fn rotate_right(&mut self);
     fn flip_colors(&mut self);
     fn balance(&mut self);
-    fn compare_key(&self, key: &K) -> Option<Ordering>;
+    fn compare_key(key: &K, link: &Link<K, V>) -> Option<Ordering>;
     fn move_red_left(&mut self);
     fn move_red_right(&mut self);
 }
@@ -60,7 +60,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn put(&mut self, key: K, val: V) {
-        match self.compare_key(&key) {
+        match Self::compare_key(&key, &self) {
             Some(Ordering::Less) => self.left_mut().put(key, val),
             Some(Ordering::Greater) => self.right_mut().put(key, val),
             Some(Ordering::Equal) => {
@@ -73,7 +73,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn get(&self, key: K) -> &Self {
-        match self.compare_key(&key) {
+        match Self::compare_key(&key, &self) {
             Some(Ordering::Less) => self.left().get(key),
             Some(Ordering::Greater) => self.right().get(key),
             Some(Ordering::Equal) | None => &self,
@@ -81,7 +81,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn delete(&mut self, key: K) {
-        match self.compare_key(&key) {
+        match Self::compare_key(&key, &self) {
             Some(Ordering::Less) => {
                 if ! self.left().is_red() && ! self.left().left().is_red() {
                     self.move_red_left();
@@ -94,7 +94,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
                     self.rotate_right();
                 }
 
-                if let Some(Ordering::Equal) = self.compare_key(&key) {
+                if let Some(Ordering::Equal) = Self::compare_key(&key, &self) {
                     if self.right().is_none() {
                         *self = None;
                         return
@@ -105,7 +105,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
                     self.move_red_right();
                 }
 
-                if let Some(Ordering::Equal) = self.compare_key(&key) {
+                if let Some(Ordering::Equal) = Self::compare_key(&key, &self) {
                     if let Some(mut boxed_node) = self.take() {
                         {
                             let node = &mut *boxed_node;
@@ -310,8 +310,8 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         self.update_size();
     }
 
-    fn compare_key(&self, key: &K) -> Option<Ordering> {
-        match *self {
+    fn compare_key(key: &K, link: &Self) -> Option<Ordering> {
+        match *link {
             Some(ref boxed_node) => {
                 if key < &boxed_node.key {
                     Some(Ordering::Less)
