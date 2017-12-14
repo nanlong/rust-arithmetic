@@ -45,6 +45,8 @@ trait LinkMethods<K, V> {
     fn move_red_right(&mut self);
     fn select(&self, k: usize) -> &Link<K, V>;
     fn rank(&self, key: K) -> usize;
+    fn floor(&self, key: K) -> &Link<K, V>;
+    fn ceiling(&self, key: K) -> &Link<K, V>;
 }
 
 impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
@@ -370,6 +372,39 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
             None => 0,
         }
     }
+
+    fn floor(&self, key: K) -> &Self {
+        match Self::compare_key(&key, &self) {
+            Some(Ordering::Less) => self.left().floor(key),
+            Some(Ordering::Greater) => {
+                let node = self.right().floor(key);
+
+                if node.is_none() {
+                    &self
+                }
+                else {
+                    node
+                }
+            },
+            Some(Ordering::Equal) | None => &self,
+        }
+    }
+
+    fn ceiling(&self, key: K) -> &Self {
+        match Self::compare_key(&key, &self) {
+            Some(Ordering::Less) => {
+                let node = self.left().ceiling(key);
+
+                if node.is_none() {
+                    &self
+                } else {
+                    node
+                }
+            },
+            Some(Ordering::Greater) => self.right().ceiling(key),
+            Some(Ordering::Equal) | None => &self,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -445,6 +480,14 @@ impl<K: PartialOrd, V> RedBlackBST<K, V> {
     pub fn rank(&self, key: K) -> usize {
         self.root.rank(key)
     }
+
+    pub fn floor(&self, key: K) -> &Link<K, V> {
+        self.root.floor(key)
+    }
+
+    pub fn ceiling(&self, key: K) -> &Link<K, V> {
+        self.root.ceiling(key)
+    }
 }
 
 
@@ -460,6 +503,9 @@ fn test() {
     tree.put("C", 6);
     tree.put("H", 7);
     tree.put("M", 8);
+
+    assert_eq!(tree.floor("J").as_ref().unwrap().key, "H");
+    assert_eq!(tree.ceiling("J").as_ref().unwrap().key, "M");
 
     assert_eq!(tree.min().as_ref().unwrap().key, "A");
     assert_eq!(tree.max().as_ref().unwrap().key, "X");
