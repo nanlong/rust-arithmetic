@@ -505,11 +505,11 @@ fn test() {
     tree.put("H", 7);
     tree.put("M", 8);
 
-    // 不存在树中的key
+    // 不存在树中的key, 获取前继元素和后继元素
     assert_eq!(tree.floor("J").as_ref().unwrap().key, "H");
     assert_eq!(tree.ceiling("J").as_ref().unwrap().key, "M");
 
-    // 存在书中的key
+    // 存在树中的key, 获取前继元素和后继元素
     assert_eq!(tree.floor("R").as_ref().unwrap().key, "M");
     assert_eq!(tree.ceiling("R").as_ref().unwrap().key, "S");
 
@@ -538,7 +538,10 @@ fn test() {
     assert_eq!(tree.rank("S"), 6);
     assert_eq!(tree.rank("X"), 7);
 
+    // 查看元素个数
     assert_eq!(tree.size(), 8);
+
+    // 获取值
     assert_eq!(tree.get("S"), Some(&1));
 
     // 删除最小元素
