@@ -22,7 +22,7 @@ enum Colors {
 trait LinkMethods<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
     fn put(&mut self, key: K, val: V);
-    fn get(&self, key: K) -> &Link<K, V>;
+    fn get(&self, key: K) -> Option<&V>;
     fn delete(&mut self, key: K);
     fn delete_min(&mut self);
     fn delete_max(&mut self);
@@ -76,11 +76,12 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         self.balance();
     }
 
-    fn get(&self, key: K) -> &Self {
+    fn get(&self, key: K) -> Option<&V> {
         match Self::compare_key(&key, &self) {
             Some(Ordering::Less) => self.left().get(key),
             Some(Ordering::Greater) => self.right().get(key),
-            Some(Ordering::Equal) | None => &self,
+            Some(Ordering::Equal) => Some(&self.as_ref().unwrap().val),
+            None => None,
         }
     }
 
@@ -421,7 +422,7 @@ impl<K: PartialOrd, V> RedBlackBST<K, V> {
         self.root.put(key, val);
     }
 
-    pub fn get(&self, key: K) -> &Link<K, V> {
+    pub fn get(&self, key: K) -> Option<&V> {
         self.root.get(key)
     }
 
@@ -504,14 +505,19 @@ fn test() {
     tree.put("H", 7);
     tree.put("M", 8);
 
+    // 不存在树中的key
     assert_eq!(tree.floor("J").as_ref().unwrap().key, "H");
     assert_eq!(tree.ceiling("J").as_ref().unwrap().key, "M");
+
+    // 存在书中的key
     assert_eq!(tree.floor("R").as_ref().unwrap().key, "M");
     assert_eq!(tree.ceiling("R").as_ref().unwrap().key, "S");
 
+    // 最小值和最大值
     assert_eq!(tree.min().as_ref().unwrap().key, "A");
     assert_eq!(tree.max().as_ref().unwrap().key, "X");
 
+    // 选择第k个元素
     assert_eq!(tree.select(0).as_ref().unwrap().key, "A");
     assert_eq!(tree.select(1).as_ref().unwrap().key, "C");
     assert_eq!(tree.select(2).as_ref().unwrap().key, "E");
@@ -522,6 +528,7 @@ fn test() {
     assert_eq!(tree.select(7).as_ref().unwrap().key, "X");
     assert!(tree.select(8).is_none());
 
+    // 查看元素的排名
     assert_eq!(tree.rank("A"), 0);
     assert_eq!(tree.rank("C"), 1);
     assert_eq!(tree.rank("E"), 2);
@@ -532,18 +539,21 @@ fn test() {
     assert_eq!(tree.rank("X"), 7);
 
     assert_eq!(tree.size(), 8);
-    assert!(tree.get("S").is_some());
+    assert_eq!(tree.get("S"), Some(&1));
 
+    // 删除最小元素
     tree.delete_min();
     assert_eq!(tree.size(), 7);
     assert!(tree.get("A").is_none());
     assert_eq!(tree.select(0).as_ref().unwrap().key, "C");
 
+    // 删除最大元素
     tree.delete_max();
     assert_eq!(tree.size(), 6);
     assert!(tree.get("X").is_none());
     assert_eq!(tree.select(5).as_ref().unwrap().key, "S");
 
+    // 根据key删除元素
     tree.delete("S");
     assert_eq!(tree.size(), 5);
     assert!(tree.get("S").is_none());
