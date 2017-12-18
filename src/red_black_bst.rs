@@ -5,8 +5,8 @@ pub type Link<K, V> = Option<Box<Node<K, V>>>;
 
 #[derive(Debug)]
 pub struct Node<K, V> {
-    key: K,
-    val: V,
+    pub key: K,
+    pub val: V,
     n: usize,
     color: Colors,
     left: Link<K, V>,
@@ -47,6 +47,10 @@ trait LinkMethods<K, V> {
     fn rank(&self, key: K) -> usize;
     fn floor(&self, key: K) -> &Link<K, V>;
     fn ceiling(&self, key: K) -> &Link<K, V>;
+    fn pre_order(&self) -> Vec<&Node<K, V>>;
+    fn in_order(&self) -> Vec<&Node<K, V>>;
+    fn post_order(&self) -> Vec<&Node<K, V>>;
+    fn level_order(&self) -> Vec<&Node<K, V>>;
 }
 
 impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
@@ -406,7 +410,111 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
             Some(Ordering::Equal) | None => &None,
         }
     }
+
+    // 前序遍历
+    fn pre_order(&self) -> Vec<&Node<K, V>> {
+        let mut stack : Vec<&Node<K, V>> = Vec::new();
+        let mut res : Vec<&Node<K, V>> = Vec::new();
+
+        if self.is_some() {
+            stack.push(self.as_ref().unwrap());
+
+            while ! stack.is_empty() {
+                let node = stack.pop().unwrap();
+                res.push(node);
+
+                if node.right.is_some() {
+                    stack.push(node.right.as_ref().unwrap());
+                }
+
+                if node.left.is_some() {
+                    stack.push(node.left.as_ref().unwrap());
+                }
+            }
+        }
+
+        res
+    }
+
+    // 中序遍历
+    fn in_order(&self) -> Vec<&Node<K, V>> {
+        let mut stack : Vec<&Node<K, V>> = Vec::new();
+        let mut res : Vec<&Node<K, V>> = Vec::new();
+        let mut p = self;
+
+        while p.is_some() || ! stack.is_empty() {
+            while p.is_some() {
+                let node = p.as_ref().unwrap();
+                stack.push(node);
+                p = &node.left;
+            }
+
+            let cur = stack.pop().unwrap();
+            res.push(cur);
+            p = &cur.right;
+        }
+
+        res
+    }
+
+    // 后序遍历
+    fn post_order(&self) -> Vec<&Node<K, V>> {
+        let mut stack : Vec<&Node<K, V>> = Vec::new();
+        let mut res : Vec<&Node<K, V>> = Vec::new();
+        let mut rev : Vec<&Node<K, V>> = Vec::new();
+
+        if self.is_some() {
+            stack.push(self.as_ref().unwrap());
+
+            while ! stack.is_empty() {
+                let node = stack.pop().unwrap();
+                res.push(node);
+
+                if node.left.is_some() {
+                    stack.push(node.left.as_ref().unwrap());
+                }
+
+                if node.right.is_some() {
+                    stack.push(node.right.as_ref().unwrap());
+                }
+            }
+
+            for node in res.iter().rev() {
+                rev.push(node);
+            }
+        }
+
+        rev
+    }
+
+    // 层级遍历
+    fn level_order(&self) -> Vec<&Node<K, V>> {
+        use std::collections::VecDeque;
+
+        let mut queue : VecDeque<&Node<K, V>> = VecDeque::new();
+        let mut res: Vec<&Node<K, V>> = Vec::new();
+
+        if self.is_some() {
+            queue.push_back(self.as_ref().unwrap());
+
+            while ! queue.is_empty() {
+                let node = queue.pop_front().unwrap();
+                res.push(node);
+
+                if node.left.is_some() {
+                    queue.push_back(node.left.as_ref().unwrap());
+                }
+
+                if node.right.is_some() {
+                    queue.push_back(node.right.as_ref().unwrap());
+                }
+            }
+        }
+
+        res
+    }
 }
+
 
 #[derive(Debug)]
 pub struct RedBlackBST<K, V> {
@@ -489,6 +597,22 @@ impl<K: PartialOrd, V> RedBlackBST<K, V> {
     pub fn ceiling(&self, key: K) -> &Link<K, V> {
         self.root.ceiling(key)
     }
+
+    pub fn pre_order(&self) -> Vec<&Node<K, V>> {
+        self.root.pre_order()
+    }
+
+    pub fn in_order(&self) -> Vec<&Node<K, V>> {
+        self.root.in_order()
+    }
+
+    pub fn post_order(&self) -> Vec<&Node<K, V>> {
+        self.root.post_order()
+    }
+
+    pub fn level_order(&self) -> Vec<&Node<K, V>> {
+        self.root.level_order()
+    }
 }
 
 
@@ -560,4 +684,6 @@ fn test() {
     tree.delete("S");
     assert_eq!(tree.size(), 5);
     assert!(tree.get("S").is_none());
+
+    tree.pre_order();
 }
