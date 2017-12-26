@@ -41,36 +41,9 @@ impl<T: Copy + Hash + Eq> Graph<T> {
 
 #[test]
 fn test() {
-    use super::depth_first_search::DepthFirstSearch;
-    use super::depth_first_paths::DepthFirstPaths;
-    use super::breadth_first_paths::BreadthFirstPaths;
-    use super::cc::CC;
-
-    let tiny_g = [
-        (0, 5),
-        (4, 3),
-        (0, 1),
-        (9, 12),
-        (6, 4),
-        (5, 4),
-        (0, 2),
-        (11, 12),
-        (9, 10),
-        (0, 6),
-        (7, 8),
-        (9, 11),
-        (5, 3),
-    ];
-
     let tiny_cg = [
-        (0, 5),
-        (2, 4),
-        (2, 3),
-        (1, 2),
-        (0, 1),
-        (3, 4),
-        (3, 5),
-        (0, 2),
+        (0, 5), (2, 4), (2, 3), (1, 2),
+        (0, 1), (3, 4), (3, 5), (0, 2),
     ];
 
     let mut cg = Graph::new();
@@ -81,27 +54,4 @@ fn test() {
 
     assert_eq!(cg.v, 6);
     assert_eq!(cg.e, 8);
-
-    let dfs = DepthFirstSearch::new(&cg, 0);
-    assert_eq!(dfs.is_marked(5), true);
-
-    let dfp = DepthFirstPaths::new(&cg, 0);
-    assert_eq!(dfp.has_path_to(4), true);
-    assert_eq!(dfp.path_to(4), [0, 5, 3, 2, 4]);
-
-    let bfp = BreadthFirstPaths::new(&cg, 0);
-    assert_eq!(bfp.has_path_to(4), true);
-    assert_eq!(bfp.path_to(4), [0, 2, 4]);
-    assert_eq!(bfp.has_path_to(5), true);
-    assert_eq!(bfp.path_to(5), [0, 5]);
-
-
-    let mut g = Graph::new();
-
-    for &(v, w) in tiny_g.iter() {
-        g.add_edge(v, w);
-    }
-
-    let cc = CC::new(&g);
-    assert_eq!(cc.count, 3);
 }

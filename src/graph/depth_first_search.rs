@@ -39,5 +39,21 @@ impl<T: Copy + Hash + Eq + Debug> DepthFirstSearch<T> {
             Some(&false) | None => false,
         }
     }
+}
 
+#[test]
+fn test() {
+    let tiny_cg = [
+        (0, 5), (2, 4), (2, 3), (1, 2),
+        (0, 1), (3, 4), (3, 5), (0, 2),
+    ];
+
+    let mut g = Graph::<i32>::new();
+
+    for &(v, w) in tiny_cg.iter() {
+        g.add_edge(v, w);
+    }
+
+    let dfs = DepthFirstSearch::new(&g, 0);
+    assert_eq!(dfs.is_marked(5), true);
 }
