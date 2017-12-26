@@ -9,17 +9,17 @@ pub struct Graph {
 impl Graph {
     // 给定顶点数量，初始化图
     pub fn new(v: usize) -> Self {
-        let mut graph = Graph {
+        let mut this = Graph {
             v,
             e: 0,
             adj: Vec::with_capacity(v),
         };
 
         for _ in 0..v {
-            graph.adj.push(Vec::new());
+            this.adj.push(Vec::new());
         }
 
-        graph
+        this
     }
 
     // 顶点数量
