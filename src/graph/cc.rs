@@ -3,8 +3,8 @@ use super::graph::Graph;
 // 连通分量
 pub struct CC {
     marked: Vec<bool>,
-    pub id: Vec<usize>,
-    pub count: usize,
+    id: Vec<usize>,
+    count: usize,
 }
 
 impl CC {
@@ -47,6 +47,14 @@ impl CC {
     pub fn connected(&self, v: usize, w: usize) -> bool {
         self.id[v] == self.id[w]
     }
+
+    pub fn id(&self) -> &Vec<usize> {
+        &self.id
+    }
+
+    pub fn count(&self) -> usize {
+        self.count
+    }
 }
 
 #[test]
@@ -64,18 +72,18 @@ fn test() {
 
     let cc = CC::new(&g);
 
-    assert_eq!(cc.count, 3);
+    assert_eq!(cc.count(), 3);
     assert!(cc.connected(2, 6));
     assert!(! cc.connected(6, 7));
 
     let mut components = Vec::new();
 
-    for _ in 0..cc.count {
+    for _ in 0..cc.count() {
         components.push(Vec::new());
     }
 
     for v in 0..g.v() {
-        components[cc.id[v]].push(v);
+        components[cc.id()[v]].push(v);
     }
 
     assert_eq!(components[0], [0, 1, 2, 3, 4, 5, 6]);
