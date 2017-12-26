@@ -1,5 +1,6 @@
 use super::graph::Graph;
 
+// 深度优先搜索路径
 pub struct DepthFirstPaths {
     marked: Vec<bool>,
     edge_to: Vec<Option<usize>>,

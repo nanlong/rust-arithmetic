@@ -1,6 +1,7 @@
 use super::graph::Graph;
 use std::collections::VecDeque;
 
+// 广度优先搜索路径
 pub struct BreadthFirstPaths {
     marked: Vec<bool>,
     edge_to: Vec<Option<usize>>,

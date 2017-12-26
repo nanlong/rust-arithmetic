@@ -1,5 +1,6 @@
 use std::fmt;
 
+// 图
 pub struct Graph {
     v: usize,
     e: usize,

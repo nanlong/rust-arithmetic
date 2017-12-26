@@ -1,5 +1,6 @@
 use super::graph::Graph;
 
+// 深度优先搜索
 pub struct DepthFirstSearch {
     marked: Vec<bool>,
     count: usize,
