@@ -1,57 +1,58 @@
-use std::collections::HashMap;
-use std::hash::Hash;
-use std::cmp::Eq;
-use std::collections::hash_map::Keys;
-
-
-pub struct Graph<T: Copy> {
+pub struct Graph {
     v: usize,
     e: usize,
-    _adj: HashMap<T, Vec<T>>,
+    adj: Vec<Vec<usize>>,
 }
 
-impl<T: Copy + Hash + Eq> Graph<T> {
-    pub fn new() -> Self {
-        Graph {v: 0, e: 0, _adj: HashMap::new()}
+impl Graph {
+    pub fn new(v: usize) -> Self {
+        let mut graph = Graph {
+            v,
+            e: 0,
+            adj: Vec::with_capacity(v),
+        };
+
+        for _ in 0..v {
+            graph.adj.push(Vec::new());
+        }
+
+        graph
     }
 
-    pub fn add_edge(&mut self, v: T, w: T) {
-        {
-            let x_edge = self._adj.entry(v).or_insert(vec![]);
-            x_edge.push(w);
-        }
+    pub fn v(&self) -> usize {
+        self.v
+    }
 
-        {
-            let y_edge = self._adj.entry(w).or_insert(vec![]);
-            y_edge.push(v);
-        }
+    pub fn e(&self) -> usize {
+        self.e
+    }
 
-        self.v = self._adj.keys().len();
+    pub fn add_edge(&mut self, v: usize, w: usize) {
+        self.adj[v].push(w);
+        self.adj[w].push(v);
         self.e += 1;
     }
 
-    pub fn adj(&self, v: T) -> Option<&Vec<T>> {
-        self._adj.get(&v)
-    }
-
-    pub fn vertices(&self) -> Keys<T, Vec<T>> {
-        self._adj.keys()
+    pub fn adj(&self, v: usize) -> &Vec<usize> {
+        &self.adj[v]
     }
 }
 
+
 #[test]
 fn test() {
-    let tiny_cg = [
-        (0, 5), (2, 4), (2, 3), (1, 2),
-        (0, 1), (3, 4), (3, 5), (0, 2),
+    let tiny_g = [
+        (0, 5), (4, 3), (0, 1), (9, 12), (6, 4), (5, 4), (0, 2),
+        (11, 12), (9, 10), (0, 6), (7, 8), (9, 11), (5, 3),
     ];
 
-    let mut cg = Graph::new();
+    let mut g = Graph::new(13);
 
-    for &(v, w) in tiny_cg.iter() {
-        cg.add_edge(v, w);
+    for &(v, w) in tiny_g.iter() {
+        g.add_edge(v, w);
     }
 
-    assert_eq!(cg.v, 6);
-    assert_eq!(cg.e, 8);
+    assert_eq!(g.v(), 13);
+    assert_eq!(g.e(), 13);
+    assert_eq!(g.adj(0), &[5, 1, 2, 6])
 }
