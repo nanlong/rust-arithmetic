@@ -5,6 +5,7 @@ pub struct Graph {
 }
 
 impl Graph {
+    // 给定顶点数量，初始化图
     pub fn new(v: usize) -> Self {
         let mut graph = Graph {
             v,
@@ -19,22 +20,64 @@ impl Graph {
         graph
     }
 
+    // 顶点数量
     pub fn v(&self) -> usize {
         self.v
     }
 
+    // 边数量
     pub fn e(&self) -> usize {
         self.e
     }
 
+    // 增加边
     pub fn add_edge(&mut self, v: usize, w: usize) {
         self.adj[v].push(w);
         self.adj[w].push(v);
         self.e += 1;
     }
 
+    // 顶点指向的顶点
     pub fn adj(&self, v: usize) -> &Vec<usize> {
         &self.adj[v]
+    }
+
+    // 顶点度数
+    pub fn degree(&self, v: usize) -> usize {
+        self.adj(v).len()
+    }
+
+    // 最大顶点度数
+    pub fn max_degree(&self) -> usize {
+        let mut max = 0;
+
+        for i in 0..self.v() {
+            if self.degree(i) > max {
+                max = self.degree(i)
+            }
+        }
+
+        max
+    }
+
+    // 平均顶点度数
+    pub fn avg_degree(&self) -> usize {
+        2 * self.e() / self.v()
+    }
+
+    // 自环个数
+    pub fn number_of_self_loops(&self) -> usize {
+        let mut count = 0;
+
+        for v in 0..self.v() {
+            for w in self.adj(v) {
+                if w == &v {
+                    count += 1;
+                }
+            }
+        }
+
+        count / 2
     }
 }
 
