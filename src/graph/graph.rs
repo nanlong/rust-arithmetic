@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub struct Graph {
     v: usize,
     e: usize,
@@ -81,6 +83,20 @@ impl Graph {
     }
 }
 
+
+impl fmt::Debug for Graph {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut string = String::new();
+
+        string.push_str(fmt::format(format_args!("{} vertices, {} edges \n", self.v(), self.e())).as_str());
+
+        for v in 0..self.v() {
+            string.push_str(fmt::format(format_args!("{}: {:?} \n", v, self.adj(v))).as_str());
+        }
+
+        write!(f, "{}", string)
+    }
+}
 
 #[test]
 fn test() {
