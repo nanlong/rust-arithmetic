@@ -35,9 +35,12 @@ impl Graph {
 
     // 增加边
     pub fn add_edge(&mut self, v: usize, w: usize) {
-        self.adj[v].push(w);
-        self.adj[w].push(v);
-        self.e += 1;
+        // 避免平行边和自环
+        if (! self.adj[v].contains(&w) && ! self.adj[w].contains(&v)) || (v != w) {
+            self.adj[v].push(w);
+            self.adj[w].push(v);
+            self.e += 1;
+        }
     }
 
     // 顶点指向的顶点
