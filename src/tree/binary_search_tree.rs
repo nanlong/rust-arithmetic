@@ -57,9 +57,9 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if key < node.key {
                     node.left.get(key)
                 }
-                else {
-                    node.right.get(key)
-                }
+                    else {
+                        node.right.get(key)
+                    }
             },
             node @ &Some(_) | node @ &None => node,
         }
@@ -71,9 +71,9 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if key < node.key {
                     node.left.get_mut(key)
                 }
-                else {
-                    node.right.get_mut(key)
-                }
+                    else {
+                        node.right.get_mut(key)
+                    }
             },
             node @ &mut Some(_) | node @ &mut None => node,
         }
@@ -85,12 +85,12 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if key < node.key {
                     node.left.put(key, val)
                 }
-                else if key > node.key {
-                    node.right.put(key, val)
-                }
-                else {
-                    node.val = val
-                }
+                    else if key > node.key {
+                        node.right.put(key, val)
+                    }
+                        else {
+                            node.val = val
+                        }
 
                 node.n = node.left.size() + node.right.size() + 1
             },
@@ -144,16 +144,16 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                     if tree_node.is_none() {
                         &self
                     }
-                    else {
-                        tree_node
+                        else {
+                            tree_node
+                        }
+                }
+                    else if key > node.key {
+                        node.right.ceiling(key)
                     }
-                }
-                else if key > node.key {
-                    node.right.ceiling(key)
-                }
-                else {
-                    &self
-                }
+                        else {
+                            &self
+                        }
             },
             None => &self,
         }
@@ -165,19 +165,19 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if key < node.key {
                     node.left.floor(key)
                 }
-                else if key > node.key {
-                    let tree_node = node.right.floor(key);
+                    else if key > node.key {
+                        let tree_node = node.right.floor(key);
 
-                    if tree_node.is_none() {
-                        &self
+                        if tree_node.is_none() {
+                            &self
+                        }
+                            else {
+                                tree_node
+                            }
                     }
-                    else {
-                        tree_node
-                    }
-                }
-                else {
-                    &self
-                }
+                        else {
+                            &self
+                        }
             },
             None => &self,
         }
@@ -191,12 +191,12 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if t < k {
                     node.right.select(k - t - 1)
                 }
-                else if t > k {
-                    node.left.select(k)
-                }
-                else {
-                    &self
-                }
+                    else if t > k {
+                        node.left.select(k)
+                    }
+                        else {
+                            &self
+                        }
             },
             None => &self,
         }
@@ -208,12 +208,12 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if key < node.key {
                     node.left.rank(key)
                 }
-                else if key > node.key {
-                    1 + node.left.size() + node.right.rank(key)
-                }
-                else {
-                    node.left.size()
-                }
+                    else if key > node.key {
+                        1 + node.left.size() + node.right.rank(key)
+                    }
+                        else {
+                            node.left.size()
+                        }
             },
             None => 0,
         }
@@ -227,10 +227,10 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if node.left.is_none() {
                     has_left = false;
                 }
-                else {
-                    node.left.delete_min();
-                    node.n = node.left.size() + node.right.size() + 1;
-                }
+                    else {
+                        node.left.delete_min();
+                        node.n = node.left.size() + node.right.size() + 1;
+                    }
             }
             None => {},
         }
@@ -248,10 +248,10 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
                 if node.right.is_none() {
                     has_right = false;
                 }
-                else {
-                    node.right.delete_max();
-                    node.n = node.left.size() + node.right.size() + 1;
-                }
+                    else {
+                        node.right.delete_max();
+                        node.n = node.left.size() + node.right.size() + 1;
+                    }
             },
             None => {},
         }
@@ -268,12 +268,12 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
             if key < node.key {
                 node.left.delete(key);
             }
-            else if key > node.key {
-                node.right.delete(key);
-            }
-            else {
-                is_self = true;
-            }
+                else if key > node.key {
+                    node.right.delete(key);
+                }
+                    else {
+                        is_self = true;
+                    }
 
             node.n = node.left.size() + node.right.size() + 1;
         }
@@ -311,75 +311,134 @@ impl<K: PartialOrd, V> ST<K, V> for Link<K, V> {
 }
 
 
+pub struct BinarySearchTree<K, V> {
+    root: Link<K, V>,
+}
+
+impl<K: PartialOrd, V> BinarySearchTree<K, V> {
+    pub fn new() -> Self {
+        BinarySearchTree { root: None }
+    }
+
+    pub fn size(&self) -> usize {
+        self.root.size()
+    }
+
+    pub fn put(&mut self, key: K, val: V) {
+        self.root.put(key, val)
+    }
+
+    pub fn get(&self, key: K) -> &Link<K, V> {
+        self.root.get(key)
+    }
+
+    pub fn min(&self) -> &Link<K, V> {
+        self.root.min()
+    }
+
+    pub fn max(&self) -> &Link<K, V> {
+        self.root.max()
+    }
+
+    pub fn floor(&self, key: K) -> &Link<K, V> {
+        self.root.floor(key)
+    }
+
+    pub fn ceiling(&self, key: K) -> &Link<K, V> {
+        self.root.ceiling(key)
+    }
+
+    pub fn select(&self, k: usize) -> &Link<K, V> {
+        self.root.select(k)
+    }
+
+    pub fn rank(&self, key: K) -> usize {
+        self.root.rank(key)
+    }
+
+    pub fn delete_min(&mut self) {
+        self.root.delete_min()
+    }
+
+    pub fn delete_max(&mut self) {
+        self.root.delete_max()
+    }
+
+    pub fn delete(&mut self, key: K) {
+        self.root.delete(key)
+    }
+}
+
 #[test]
 fn test() {
-    let mut node = Link::new("S", 1);
-    assert_eq!(node.size(), 1);
+    let mut bst = BinarySearchTree::<&str, isize>::new();
+    assert_eq!(bst.size(), 0);
 
-    node.put("S", 1);
-    node.put("E", 2);
-    node.put("X", 3);
-    node.put("A", 4);
-    node.put("R", 5);
-    node.put("C", 6);
-    node.put("H", 7);
-    node.put("M", 8);
+    bst.put("S", 1);
+    bst.put("E", 2);
+    bst.put("X", 3);
+    bst.put("A", 4);
+    bst.put("R", 5);
+    bst.put("C", 6);
+    bst.put("H", 7);
+    bst.put("M", 8);
 
-    assert_eq!(node.size(), 8);
+    assert_eq!(bst.size(), 8);
 
-    match *node.get("A") {
-        Some(ref node) => assert_eq!(node.val, 4),
+
+    match *bst.get("C") {
+        Some(ref node) => assert_eq!(node.val, 6),
         None => assert!(false),
     }
 
-    match *node.min() {
+    match *bst.min() {
         Some(ref node) => assert_eq!(node.key, "A"),
         None => assert!(false),
     }
 
-    match *node.max() {
+    match *bst.max() {
         Some(ref node) => assert_eq!(node.key, "X"),
         None => assert!(false),
     }
 
-    match *node.ceiling("G") {
-        Some(ref node) => assert_eq!(node.key, "H"),
-        None => assert!(false),
-    }
-
-    match *node.floor("G") {
+    match *bst.floor("G") {
         Some(ref node) => assert_eq!(node.key, "E"),
         None => assert!(false),
     }
 
-    match *node.select(5) {
+    match *bst.ceiling("G") {
+        Some(ref node) => assert_eq!(node.key, "H"),
+        None => assert!(false),
+    }
+
+    match *bst.select(5) {
         Some(ref node) => assert_eq!(node.key, "R"),
         None => assert!(false),
     }
 
-    assert_eq!(node.rank("R"), 5);
+    assert_eq!(bst.rank("R"), 5);
 
-    node.delete_min();
-    assert_eq!(node.size(), 7);
+    bst.delete_min();
+    assert_eq!(bst.size(), 7);
 
-    match *node.min() {
+    match *bst.min() {
         Some(ref node) => assert_eq!(node.key, "C"),
         None => assert!(false),
     }
 
-    node.delete_max();
-    assert_eq!(node.size(), 6);
+    bst.delete_max();
+    assert_eq!(bst.size(), 6);
 
-    match *node.max() {
+    match *bst.max() {
         Some(ref node) => assert_eq!(node.key, "S"),
         None => assert!(false),
     }
 
-    node.delete("E");
-    match *node.get("E") {
+    bst.delete("E");
+    match *bst.get("E") {
         Some(_) => assert!(false),
         None => assert!(true),
     }
 
-    assert_eq!(node.size(), 5);
+    assert_eq!(bst.size(), 5);
 }

@@ -517,13 +517,13 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
 
 
 #[derive(Debug)]
-pub struct RedBlackBST<K, V> {
+pub struct RedBlackTree<K, V> {
     root: Link<K, V>,
 }
 
-impl<K: PartialOrd, V> RedBlackBST<K, V> {
+impl<K: PartialOrd, V> RedBlackTree<K, V> {
     pub fn new() -> Self {
-        RedBlackBST { root: None }
+        RedBlackTree { root: None }
     }
 
     pub fn put(&mut self, key: K, val: V) {
@@ -618,7 +618,7 @@ impl<K: PartialOrd, V> RedBlackBST<K, V> {
 
 #[test]
 fn test() {
-    let mut tree = RedBlackBST::<&str, isize>::new();
+    let mut tree = RedBlackTree::<&str, isize>::new();
     // A C E H M R S X
     tree.put("S", 1);
     tree.put("E", 2);

@@ -195,13 +195,13 @@ impl<K : PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
 }
 
 #[derive(Debug)]
-pub struct AvlBST<K, V> {
+pub struct AvlTree<K, V> {
     root: Link<K, V>,
 }
 
-impl<K : PartialOrd, V> AvlBST<K, V> {
+impl<K : PartialOrd, V> AvlTree<K, V> {
     pub fn new() -> Self {
-        AvlBST { root: None }
+        AvlTree { root: None }
     }
 
     pub fn put(&mut self, key: K, val: V) {
@@ -216,7 +216,7 @@ impl<K : PartialOrd, V> AvlBST<K, V> {
 #[test]
 fn test() {
     extern crate rand;
-    let mut tree = AvlBST::<u16, usize>::new();
+    let mut tree = AvlTree::<u16, usize>::new();
 
     for i in 1..2000 {
         tree.put(rand::random::<u16>(), i);
