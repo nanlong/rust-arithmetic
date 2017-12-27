@@ -47,6 +47,27 @@ impl<'a> SymbolGraph<'a> {
         // 主数据
         SymbolGraph { st, keys, g }
     }
+
+    pub fn contains(&self, s: &str) -> bool {
+        self.st.contains_key(s)
+    }
+
+    pub fn index(&self, s: &str) -> Option<&usize> {
+        self.st.get(s)
+    }
+
+    pub fn name(&self, v: usize) -> Option<&str> {
+        if v >= self.keys.len() {
+            None
+        }
+        else {
+            Some(self.keys[v])
+        }
+    }
+
+    pub fn g(&self) -> &Graph {
+        &self.g
+    }
 }
 
 #[test]
@@ -73,4 +94,17 @@ fn test() {
     ];
 
     let symbol_graph = SymbolGraph::new(routes);
+
+    assert!(symbol_graph.contains("JFK"));
+    assert!(! symbol_graph.contains("ABC"));
+
+    assert_eq!(symbol_graph.index("JFK"), Some(&0));
+    assert_eq!(symbol_graph.index("LAS"), Some(&9));
+    assert_eq!(symbol_graph.index("ABC"), None);
+
+    assert_eq!(symbol_graph.name(0), Some("JFK"));
+    assert_eq!(symbol_graph.name(9), Some("LAS"));
+    assert_eq!(symbol_graph.name(10), None);
+    
+    assert_eq!(symbol_graph.g().v(), 10)
 }
