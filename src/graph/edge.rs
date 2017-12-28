@@ -1,11 +1,13 @@
 use std::cmp::Ordering;
 
 // 加权图中的边
+#[derive(PartialEq)]
 pub struct Edge {
     v: usize,
     w: usize,
     weight: f32,
 }
+
 
 impl Edge {
     pub fn new(v: usize, w: usize, weight: f32) -> Self {
@@ -34,21 +36,13 @@ impl Edge {
             None
         }
     }
-
-    // 边的对比
-    pub fn compare_to(&self, edge: &Edge) -> Ordering {
-        if self.weight() < edge.weight() {
-            Ordering::Less
-        }
-        else if self.weight() > edge.weight() {
-            Ordering::Greater
-        }
-        else {
-            Ordering::Equal
-        }
-    }
 }
 
+impl PartialOrd for Edge {
+    fn partial_cmp(&self, other: &Edge) -> Option<Ordering> {
+        self.weight().partial_cmp(&other.weight())
+    }
+}
 
 #[test]
 fn test() {
@@ -59,6 +53,6 @@ fn test() {
     assert_eq!(edge.other(1), None);
 
     let edge2 = Edge::new(1, 2, 1.1);
-    assert_eq!(edge.compare_to(&edge2), Ordering::Less);
-    assert_eq!(edge2.compare_to(&edge), Ordering::Greater);
+    assert_eq!(edge.partial_cmp(&edge2), Some(Ordering::Less));
+    assert_eq!(edge2.partial_cmp(&edge), Some(Ordering::Greater));
 }

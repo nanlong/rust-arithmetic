@@ -22,4 +22,6 @@
         * [二分图检测](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/two_color.rs)
     * [符号图](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/symbol_graph.rs)
     * 有向图
+    * 加权图
         * [边](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/edge.rs)
+        * [加权无向图](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/edge_weighted_graph.rs)
