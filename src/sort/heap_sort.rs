@@ -14,8 +14,10 @@ pub fn heap_sort<T, F: Fn(&T, &T) -> bool>(seq: &mut [T], compare: &F) {
 }
 
 fn sift_down<T, F: Fn(&T, &T) -> bool>(seq: &mut [T], mut root: usize, finish: usize, compare: &F) {
+    let mut child;
+
     while root < finish {
-        let mut child = root * 2 + 1;
+        child = root * 2 + 1;
 
         if child > finish {
             break
