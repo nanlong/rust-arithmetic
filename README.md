@@ -5,7 +5,7 @@
 * [排序](https://github.com/nanlong/arithmetic_rs/tree/master/src/sort)
     * [快排](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/quick_sort.rs)
     * [冒泡](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/bubble_sort.rs)
-    
+    * [堆排](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/heap_sort.rs)
     
 * [树](https://github.com/nanlong/arithmetic_rs/tree/master/src/tree)
     * [二分搜索树](https://github.com/nanlong/arithmetic_rs/blob/master/src/tree/binary_search_tree.rs)
