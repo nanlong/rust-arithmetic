@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::f32;
 
 // 加权图中的边
-#[derive(Debug, Ord, Eq, PartialOrd, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Edge {
     v: usize,
     w: usize,
@@ -39,6 +39,20 @@ impl Edge {
     }
 }
 
+// for min-heap
+// 在 BinaryHeap 中实现小根堆
+impl Ord for Edge {
+    fn cmp(&self, other: &Edge) -> Ordering {
+        other.weight.cmp(&self.weight)
+    }
+}
+
+impl PartialOrd for Edge {
+    fn partial_cmp(&self, other: &Edge) -> Option<Ordering> {
+        Some(self.cmp(&other))
+    }
+}
+
 
 #[test]
 fn test() {
@@ -50,11 +64,11 @@ fn test() {
     assert_eq!(edge.other(0), Some(5));
     assert_eq!(edge.other(1), None);
     
-    assert!(edge < edge2);
-    assert!(edge2 > edge);
-    assert_eq!(edge.cmp(&edge2), Ordering::Less);
-    assert_eq!(edge2.cmp(&edge), Ordering::Greater);
-    assert_eq!(edge.partial_cmp(&edge2), Some(Ordering::Less));
-    assert_eq!(edge2.partial_cmp(&edge), Some(Ordering::Greater));
+    assert!(edge > edge2);
+    assert!(edge2 < edge);
+    assert_eq!(edge.cmp(&edge2), Ordering::Greater);
+    assert_eq!(edge2.cmp(&edge), Ordering::Less);
+    assert_eq!(edge.partial_cmp(&edge2), Some(Ordering::Greater));
+    assert_eq!(edge2.partial_cmp(&edge), Some(Ordering::Less));
 
 }
