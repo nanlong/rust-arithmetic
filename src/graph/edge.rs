@@ -42,13 +42,19 @@ impl Edge {
 
 #[test]
 fn test() {
-    let ref mut edge = Edge::new(0, 5, 0.8);
+    let edge = Edge::new(0, 5, 0.8);
+    let edge2 = Edge::new(1, 2, 1.1);
+
     assert_eq!(edge.weight(), 0.8);
     assert_eq!(edge.either(), 0);
     assert_eq!(edge.other(0), Some(5));
     assert_eq!(edge.other(1), None);
-
-    let ref mut edge2 = Edge::new(1, 2, 1.1);
+    
+    assert!(edge < edge2);
+    assert!(edge2 > edge);
     assert_eq!(edge.cmp(&edge2), Ordering::Less);
     assert_eq!(edge2.cmp(&edge), Ordering::Greater);
+    assert_eq!(edge.partial_cmp(&edge2), Some(Ordering::Less));
+    assert_eq!(edge2.partial_cmp(&edge), Some(Ordering::Greater));
+
 }
