@@ -1,22 +1,23 @@
 use std::cmp::Ordering;
+use std::f32;
 
 // 加权图中的边
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq, Eq, Ord)]
 pub struct Edge {
     v: usize,
     w: usize,
-    weight: f32,
+    weight: u32,
 }
 
 
 impl Edge {
     pub fn new(v: usize, w: usize, weight: f32) -> Self {
-        Edge {v, w, weight}
+        Edge {v, w, weight: weight.to_bits()}
     }
 
     // 权重
     pub fn weight(&self) -> f32 {
-        self.weight
+        f32::from_bits(self.weight)
     }
 
     // 其中的1个顶点
@@ -43,6 +44,7 @@ impl PartialOrd for Edge {
         self.weight().partial_cmp(&other.weight())
     }
 }
+
 
 #[test]
 fn test() {

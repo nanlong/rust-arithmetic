@@ -8,3 +8,5 @@ pub mod two_color;
 pub mod symbol_graph;
 pub mod edge;
 pub mod edge_weighted_graph;
+pub mod mst;
+pub mod lazy_prim_mst;
