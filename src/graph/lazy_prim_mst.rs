@@ -65,8 +65,8 @@ impl LazyPrimMST {
     }
 
     // 最小生成树的边
-    pub fn edges(&self) -> &Vec<Rc<Edge>> {
-        &self.mst
+    pub fn edges(&self) -> Vec<Rc<Edge>> {
+        self.mst.to_vec()
     }
 
     // 最小生成树的权重
