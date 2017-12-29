@@ -3,7 +3,7 @@ use std::collections::BinaryHeap;
 use super::edge::Edge;
 use super::edge_weighted_graph::EdgeWeightedGraph;
 
-// 最小生成树 Prim 算法
+// 最小生成树 Prim 算法（延迟版本）
 pub struct LazyPrimMST {
     marked: Vec<bool>,          // 最小生成树的顶点
     mst: Vec<Rc<Edge>>,         // 最小生成树的边
