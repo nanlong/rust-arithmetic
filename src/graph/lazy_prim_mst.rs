@@ -3,12 +3,11 @@ use std::collections::BinaryHeap;
 use super::edge::Edge;
 use super::edge_weighted_graph::EdgeWeightedGraph;
 
-// 最小生成树
-// Prim算法
+// 最小生成树 Prim 算法
 pub struct LazyPrimMST {
     marked: Vec<bool>,          // 最小生成树的顶点
     mst: Vec<Rc<Edge>>,         // 最小生成树的边
-    pq: BinaryHeap<Rc<Edge>>,   // 横切边（包括失效的边）
+    pq: BinaryHeap<Rc<Edge>>,   // 横切边（包括失效的边）这个优先队列由小到大排序 原因看 Edge 的代码实现
 }
 
 impl LazyPrimMST {
@@ -26,7 +25,7 @@ impl LazyPrimMST {
         this.visit(g, 0);
 
         while ! this.pq.is_empty() {
-            // 从pq中得到权重最小的边
+            // 从 pq 中得到权重最小的边
             let edge = this.pq.pop().unwrap();
 
             // 跳过失效的边
@@ -40,7 +39,7 @@ impl LazyPrimMST {
             // 将边添加到树中
             this.mst.push(edge.clone());
 
-            // 将顶点（v或者w）添加到树中
+            // 将顶点（ v 或者 w ）添加到树中
             if ! this.marked[v] {
                 this.visit(g, v);
             }
@@ -99,6 +98,14 @@ fn test() {
 
     let mst = LazyPrimMST::new(&g);
 
+    // 最小边包含
+    //    0-7 0.16
+    //    1-7 0.19
+    //    0-2 0.26
+    //    2-3 0.17
+    //    5-7 0.28
+    //    4-5 0.35
+    //    6-2 0.40
     assert_eq!(mst.edges().len(), g.v() - 1);
     assert_eq!(mst.weight(), 1.8100001);
 }

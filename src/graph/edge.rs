@@ -9,7 +9,6 @@ pub struct Edge {
     weight: u32,
 }
 
-
 impl Edge {
     pub fn new(v: usize, w: usize, weight: f32) -> Self {
         Edge {v, w, weight: weight.to_bits()}
@@ -39,8 +38,7 @@ impl Edge {
     }
 }
 
-// for min-heap
-// 在 BinaryHeap 中实现小根堆
+// 在 std::collections::BinaryHeap 中实现由小到大排序的优先队列
 impl Ord for Edge {
     fn cmp(&self, other: &Edge) -> Ordering {
         other.weight.cmp(&self.weight)
