@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::f32;
 
 // 加权图中的边
-#[derive(Debug, PartialEq, Eq, Ord)]
+#[derive(Debug, Ord, Eq, PartialOrd, PartialEq)]
 pub struct Edge {
     v: usize,
     w: usize,
@@ -39,22 +39,16 @@ impl Edge {
     }
 }
 
-impl PartialOrd for Edge {
-    fn partial_cmp(&self, other: &Edge) -> Option<Ordering> {
-        self.weight().partial_cmp(&other.weight())
-    }
-}
-
 
 #[test]
 fn test() {
-    let edge = Edge::new(0, 5, 0.8);
+    let ref mut edge = Edge::new(0, 5, 0.8);
     assert_eq!(edge.weight(), 0.8);
     assert_eq!(edge.either(), 0);
     assert_eq!(edge.other(0), Some(5));
     assert_eq!(edge.other(1), None);
 
-    let edge2 = Edge::new(1, 2, 1.1);
-    assert_eq!(edge.partial_cmp(&edge2), Some(Ordering::Less));
-    assert_eq!(edge2.partial_cmp(&edge), Some(Ordering::Greater));
+    let ref mut edge2 = Edge::new(1, 2, 1.1);
+    assert_eq!(edge.cmp(&edge2), Ordering::Less);
+    assert_eq!(edge2.cmp(&edge), Ordering::Greater);
 }
