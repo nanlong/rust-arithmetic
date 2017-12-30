@@ -41,18 +41,21 @@ impl UnionFind {
         let i = self.find(p);
         let j = self.find(q);
 
-        if i != j {
-            if self.sz[i] < self.sz[j] {
-                self.id[i] = j;
-                self.sz[j] += self.sz[i];
-            }
-            else {
-                self.id[j] = i;
-                self.sz[i] += self.sz[j];
-            }
-
-            self.count -= 1;
+        if i == j {
+            return
         }
+
+        if self.sz[i] < self.sz[j] {
+            self.id[i] = j;
+            self.sz[j] += self.sz[i];
+        }
+        else {
+            self.id[j] = i;
+            self.sz[i] += self.sz[j];
+        }
+
+        self.count -= 1;
+
     }
 }
 
