@@ -16,6 +16,7 @@
     * [红黑树](https://github.com/nanlong/arithmetic_rs/blob/master/src/tree/red_black_tree.rs)
     
 * [图](https://github.com/nanlong/arithmetic_rs/tree/master/src/graph)
+    * [并查集](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/union_find.rs)
     * [无向图](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/graph.rs)
         * [深度优先搜索](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/depth_first_search.rs)
         * [深度优先路径](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/depth_first_paths.rs)
