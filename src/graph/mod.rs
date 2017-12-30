@@ -11,3 +11,4 @@ pub mod edge;
 pub mod edge_weighted_graph;
 pub mod lazy_prim_mst;
 pub mod prim_mst;
+pub mod kruskal_mst;

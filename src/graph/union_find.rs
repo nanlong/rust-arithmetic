@@ -6,14 +6,14 @@ pub struct UnionFind {
 }
 
 impl UnionFind {
-    pub fn new(n: usize) -> Self {
+    pub fn with_capacity(capacity: usize) -> Self {
         let mut this = UnionFind {
-            id: Vec::with_capacity(n),
-            sz: Vec::with_capacity(n),
-            count: n,
+            id: Vec::with_capacity(capacity),
+            sz: Vec::with_capacity(capacity),
+            count: capacity,
         };
 
-        for i in 0..n {
+        for i in 0..capacity {
             this.id.push(i);
             this.sz.push(1);
         }
@@ -67,7 +67,7 @@ fn test() {
         (6, 7),
     ];
 
-    let mut uf = UnionFind::new(10);
+    let mut uf = UnionFind::with_capacity(10);
 
     for &(p, q) in tiny_uf.iter() {
         uf.union(p, q);

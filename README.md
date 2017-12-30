@@ -32,3 +32,4 @@
         * 最小生成树
             * [Prim 算法（延迟版本）](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/lazy_prim_mst.rs)
             * [Prim 算法（即时版本）](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/prim_mst.rs)
+            * [Kruskal 算法](https://github.com/nanlong/arithmetic_rs/blob/master/src/graph/kruskal_mst.rs)
