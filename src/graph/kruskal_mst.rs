@@ -14,8 +14,8 @@ pub struct KruskalMST {
 impl KruskalMST {
     pub fn new(g: &EdgeWeightedGraph) -> Self {
         let mut this = KruskalMST {
-            mst: Vec::with_capacity(g.v()),
-            pq: BinaryHeap::with_capacity(g.v()),
+            mst: Vec::new(),
+            pq: BinaryHeap::new(),
             un: UnionFind::with_capacity(g.v()),
         };
 
