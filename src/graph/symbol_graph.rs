@@ -36,7 +36,7 @@ impl<'a> SymbolGraph<'a> {
         }
 
         // 初始化 g
-        let mut g = Graph::new(keys.len());
+        let mut g = Graph::with_capacity(keys.len());
 
         for row in &data {
             if let (Some(v), Some(w)) = (st.get(row[0]), st.get(row[1])) {

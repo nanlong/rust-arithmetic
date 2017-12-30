@@ -94,7 +94,7 @@ fn test() {
         (6, 2, 0.40), (3, 6, 0.52), (6, 0, 0.58), (6, 4, 0.93),
     ];
 
-    let mut g = EdgeWeightedGraph::new(8);
+    let mut g = EdgeWeightedGraph::with_capacity(8);
 
     for &(v, w, weight) in tiny_ewg.iter() {
         g.add_edge(Edge::new(v, w, weight));

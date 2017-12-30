@@ -10,14 +10,14 @@ pub struct EdgeWeightedGraph {
 }
 
 impl EdgeWeightedGraph {
-    pub fn new(v: usize) -> Self {
+    pub fn with_capacity(capacity: usize) -> Self {
         let mut this = EdgeWeightedGraph {
-            v,
+            v: capacity,
             e: 0,
-            adj: Vec::with_capacity(v),
+            adj: Vec::with_capacity(capacity),
         };
 
-        for _ in 0..v {
+        for _ in 0..capacity {
             this.adj.push(Vec::new());
         }
 
@@ -74,7 +74,7 @@ fn test() {
         (6, 2, 0.40), (3, 6, 0.52), (6, 0, 0.58), (6, 4, 0.93),
     ];
 
-    let mut g = EdgeWeightedGraph::new(8);
+    let mut g = EdgeWeightedGraph::with_capacity(8);
 
     for &(v, w, weight) in tiny_ewg.iter() {
         g.add_edge(Edge::new(v, w, weight));

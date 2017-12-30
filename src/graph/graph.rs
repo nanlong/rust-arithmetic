@@ -9,14 +9,14 @@ pub struct Graph {
 
 impl Graph {
     // 给定顶点数量，初始化图
-    pub fn new(v: usize) -> Self {
+    pub fn with_capacity(capacity: usize) -> Self {
         let mut this = Graph {
-            v,
+            v: capacity,
             e: 0,
-            adj: Vec::with_capacity(v),
+            adj: Vec::with_capacity(capacity),
         };
 
-        for _ in 0..v {
+        for _ in 0..capacity {
             this.adj.push(Vec::new());
         }
 
@@ -109,7 +109,7 @@ fn test() {
         (11, 12), (9, 10), (0, 6), (7, 8), (9, 11), (5, 3),
     ];
 
-    let mut g = Graph::new(13);
+    let mut g = Graph::with_capacity(13);
 
     for &(v, w) in tiny_g.iter() {
         g.add_edge(v, w);

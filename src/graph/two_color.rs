@@ -57,7 +57,7 @@ fn test() {
         (11, 12), (9, 10), (0, 6), (7, 8), (9, 11), (5, 3),
     ];
 
-    let mut g = Graph::new(13);
+    let mut g = Graph::with_capacity(13);
 
     for &(v, w) in tiny_g.iter() {
         g.add_edge(v, w);
@@ -72,7 +72,7 @@ fn test() {
         (1, 2), (1, 3),
     ];
 
-    let mut g = Graph::new(13);
+    let mut g = Graph::with_capacity(13);
 
     for &(v, w) in two_g.iter() {
         g.add_edge(v, w);
