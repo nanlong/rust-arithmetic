@@ -1,3 +1,4 @@
+// 索引优先队列
 pub struct IndexBinaryHeap<T> {
     n: usize,                   // 元素数量
     pq: Vec<Option<usize>>,     // pq[n], 第 n 名是什么数字
