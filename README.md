@@ -9,8 +9,7 @@
     * [归并](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/merge_sort.rs)
 * 队列
     * [索引优先队列](https://github.com/nanlong/arithmetic_rs/blob/master/src/queue/index_binary_heap.rs)
-    * [最小索引优先队列](https://github.com/nanlong/arithmetic_rs/blob/master/src/queue/index_min_pq.rs)
-
+    
 * [树](https://github.com/nanlong/arithmetic_rs/tree/master/src/tree)
     * [二分搜索树](https://github.com/nanlong/arithmetic_rs/blob/master/src/tree/binary_search_tree.rs)
     * [AVL树](https://github.com/nanlong/arithmetic_rs/blob/master/src/tree/avl_tree.rs)

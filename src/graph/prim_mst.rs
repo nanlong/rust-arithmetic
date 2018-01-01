@@ -1,15 +1,39 @@
 use std::f32;
 use std::rc::Rc;
+use std::cmp::Ordering;
 use super::edge::Edge;
 use super::edge_weighted_graph::EdgeWeightedGraph;
-use super::super::queue::index_min_pq::IndexMinPQ;
+use super::super::queue::index_binary_heap::IndexBinaryHeap;
+
+// 实现最小索引优先队列，重写 Ord 和 PartialOrd
+#[derive(Eq, PartialEq)]
+struct Weight(u32);
+
+impl Weight {
+    pub fn new(n: f32) -> Self {
+        Weight(n.to_bits())
+    }
+}
+
+impl Ord for Weight {
+    fn cmp(&self, other: &Weight) -> Ordering {
+        other.0.cmp(&self.0)
+    }
+}
+
+impl PartialOrd for Weight {
+    fn partial_cmp(&self, other: &Weight) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 
 // 最小生成树 Prim 算法（即时版本）
 pub struct PrimMST {
-    edge_to: Vec<Option<Rc<Edge>>>,
-    dist_to: Vec<f32>,
-    marked: Vec<bool>,
-    pq: IndexMinPQ<f32>,
+    edge_to: Vec<Option<Rc<Edge>>>, // 路径
+    dist_to: Vec<f32>,              // 权重
+    marked: Vec<bool>,              // 顶点
+    pq: IndexBinaryHeap<Weight>,    // 最小索引优先队列
 }
 
 impl PrimMST {
@@ -18,7 +42,7 @@ impl PrimMST {
             edge_to: Vec::with_capacity(g.v()),
             dist_to: Vec::with_capacity(g.v()),
             marked: Vec::with_capacity(g.v()),
-            pq: IndexMinPQ::with_capacity(g.v()),
+            pq: IndexBinaryHeap::with_capacity(g.v()),
         };
 
         for _ in 0..g.v() {
@@ -28,7 +52,7 @@ impl PrimMST {
         }
 
         this.dist_to[0] = 0.0;
-        this.pq.push(0, 0.0);
+        this.pq.put(0, Weight::new(0.0));
 
         while ! this.pq.is_empty() {
             let v = this.pq.pop();
@@ -51,13 +75,8 @@ impl PrimMST {
             if e.weight() < self.dist_to[w] {
                 self.edge_to[w] = Some(e.clone());
                 self.dist_to[w] = e.weight();
-
-                if self.pq.contains(w) {
-                    self.pq.change(w, e.weight());
-                }
-                else {
-                    self.pq.push(w, e.weight());
-                }
+                // 有则更新，无则添加
+                self.pq.put(w, Weight::new(e.weight()));
             }
         }
     }
