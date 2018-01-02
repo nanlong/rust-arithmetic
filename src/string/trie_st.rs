@@ -83,10 +83,12 @@ impl<T: fmt::Debug> TrieST<T> {
 
     // 查找所有键
     pub fn keys(&self) -> Vec<String> {
-        self.keys_with_prefix(String::from(""))
+        self.keys_with_prefix("")
     }
 
-    fn keys_with_prefix(&self, pre: String) -> Vec<String> {
+    // 前缀匹配
+    pub fn keys_with_prefix(&self, pre: &str) -> Vec<String> {
+        let pre = String::from(pre);
         let mut q = Vec::new();
         self.collect(self.root.get(pre.as_ref(), 0), pre, &mut q);
         q
@@ -124,7 +126,9 @@ fn test() {
     trie_st.put("cbd", 2);
     trie_st.put("bde", 3);
     trie_st.put("def", 4);
+    trie_st.put("abf", 5);
 
     assert_eq!(trie_st.get("def"), &Some(4));
-    assert_eq!(trie_st.keys(), ["abc", "bde", "cbd", "def"]);
+    assert_eq!(trie_st.keys(), ["abc", "abf", "bde", "cbd", "def"]);
+    assert_eq!(trie_st.keys_with_prefix("ab"), ["abc", "abf"]);
 }
