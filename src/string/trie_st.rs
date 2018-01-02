@@ -1,9 +1,10 @@
 // 字典树
-
+use std::fmt;
 const R: usize = 256;
 
 type Link<T> = Option<Box<Node<T>>>;
 
+#[derive(Debug)]
 struct Node<T> {
     val: Option<T>,
     next: Vec<Link<T>>
@@ -15,7 +16,7 @@ trait LinkMethods<T> {
     fn put(&mut self, key: &str, val: T, d: usize) -> Link<T>;
 }
 
-impl<T> LinkMethods<T> for Link<T> {
+impl<T: fmt::Debug> LinkMethods<T> for Link<T> {
     fn new() -> Self {
         let mut this = Box::new(Node {
             val: None,
@@ -31,15 +32,12 @@ impl<T> LinkMethods<T> for Link<T> {
 
     fn get(&self, key: &str, d: usize) -> &Self {
         match *self {
-            Some(ref boxed_node) => {
-                if d == key.chars().count() {
-                    return &self
-                }
-
-                let c = key.chars().nth(d).unwrap() as usize;
-                boxed_node.next[c].get(key, d)
-            }
             None => &self,
+            Some(_) if d == key.chars().count() => &self,
+            Some(ref boxed_node) => {
+                let c = key.chars().nth(d).unwrap() as usize;
+                boxed_node.next[c].get(key, d + 1)
+            }
         }
     }
 
@@ -61,11 +59,12 @@ impl<T> LinkMethods<T> for Link<T> {
     }
 }
 
+#[derive(Debug)]
 pub struct TrieST<T> {
     root: Link<T>,
 }
 
-impl<T> TrieST<T> {
+impl<T: fmt::Debug> TrieST<T> {
 
     pub fn new() -> Self {
         TrieST { root: None }
@@ -79,7 +78,7 @@ impl<T> TrieST<T> {
     }
 
     pub fn put(&mut self, key: &str, val: T) {
-        self.root = self.root.put(key, val, 1);
+        self.root = self.root.put(key, val, 0);
     }
 }
 
@@ -93,6 +92,5 @@ fn test() {
     trie_st.put("bde", 3);
     trie_st.put("def", 4);
 
-    // error
-    assert_eq!(trie_st.get("def"), &None);
+    assert_eq!(trie_st.get("def"), &Some(4));
 }
