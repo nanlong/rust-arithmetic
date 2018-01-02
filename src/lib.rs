@@ -3,3 +3,4 @@ pub mod sort;
 pub mod queue;
 pub mod tree;
 pub mod graph;
+pub mod string;
