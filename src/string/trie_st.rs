@@ -80,6 +80,39 @@ impl<T: fmt::Debug> TrieST<T> {
     pub fn put(&mut self, key: &str, val: T) {
         self.root = self.root.put(key, val, 0);
     }
+
+    // 查找所有键
+    pub fn keys(&self) -> Vec<String> {
+        self.keys_with_prefix(String::from(""))
+    }
+
+    fn keys_with_prefix(&self, pre: String) -> Vec<String> {
+        let mut q = Vec::new();
+        self.collect(self.root.get(pre.as_ref(), 0), pre, &mut q);
+        q
+    }
+
+    fn collect(&self, node: &Link<T>, pre: String, q: &mut Vec<String>) {
+        let boxed_node = match *node {
+            Some(ref boxed_node) => boxed_node,
+            None => return,
+        };
+
+        if boxed_node.val.is_some() {
+            q.push(pre.clone());
+        }
+
+        for c in 0..R {
+            match String::from_utf8(vec![c as u8]) {
+                Ok(cc) => {
+                    let mut pre = pre.clone();
+                    pre.push_str(cc.as_ref());
+                    self.collect(&boxed_node.next[c], pre, q);
+                },
+                Err(_) => {},
+            }
+        }
+    }
 }
 
 
@@ -93,4 +126,5 @@ fn test() {
     trie_st.put("def", 4);
 
     assert_eq!(trie_st.get("def"), &Some(4));
+    assert_eq!(trie_st.keys(), ["abc", "bde", "cbd", "def"]);
 }
