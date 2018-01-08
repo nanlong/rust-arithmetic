@@ -7,6 +7,7 @@
     * [冒泡](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/bubble_sort.rs)
     * [堆排](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/heap_sort.rs)
     * [归并](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/merge_sort.rs)
+    * [插入](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/insert_sort.rs)
 * 队列
     * [索引优先队列](https://github.com/nanlong/arithmetic_rs/blob/master/src/queue/index_binary_heap.rs)
     
