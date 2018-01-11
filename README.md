@@ -8,7 +8,7 @@
     * [堆排](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/heap_sort.rs)
     * [归并](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/merge_sort.rs)
     * [插入](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/insert_sort.rs)
-    * [选择](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/select_sort.rs)
+    * [选择](https://github.com/nanlong/arithmetic_rs/blob/master/src/sort/selection_sort.rs)
 
 
 * 队列
