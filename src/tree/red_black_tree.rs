@@ -340,8 +340,8 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         self.flip_colors();
 
         if self.right().left().is_red() {
-            self.right_mut().rotate_left();
-            self.rotate_right();
+            self.right_mut().rotate_right();
+            self.rotate_left();
         }
     }
 
