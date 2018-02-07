@@ -19,6 +19,11 @@ enum Colors {
     BLACK,
 }
 
+enum FlipType {
+    UP,
+    DOWN,
+}
+
 trait LinkMethods<K, V> {
     fn new(key: K, val: V) -> Link<K, V>;
     fn put(&mut self, key: K, val: V);
@@ -38,7 +43,7 @@ trait LinkMethods<K, V> {
     fn max(&self) -> &Link<K, V>;
     fn rotate_left(&mut self);
     fn rotate_right(&mut self);
-    fn flip_colors(&mut self);
+    fn flip_colors(&mut self, flip_type: FlipType);
     fn balance(&mut self);
     fn compare_key(key: &K, link: &Link<K, V>) -> Option<Ordering>;
     fn move_red_left(&mut self);
@@ -92,6 +97,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     fn delete(&mut self, key: K) {
         match Self::compare_key(&key, &self) {
             Some(Ordering::Less) => {
+                // 确保左侧节点为红色
                 if ! self.left().is_red() && ! self.left().left().is_red() {
                     self.move_red_left();
                 }
@@ -99,6 +105,7 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
                 self.left_mut().delete(key);
             },
             Some(Ordering::Greater) | Some(Ordering::Equal) => {
+                // 因为要经过右分支，所以如果 h.left 为红色，就进行右旋
                 if self.left().is_red() {
                     self.rotate_right();
                 }
@@ -110,10 +117,12 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
                     }
                 }
 
+                // 确保右侧节点为红色
                 if ! self.right().is_red() && ! self.right().left().is_red() {
                     self.move_red_right();
                 }
 
+                // 经过旋转之后，当前节点匹配成功的话，右侧节点必定不为空
                 if let Some(Ordering::Equal) = Self::compare_key(&key, &self) {
                     if let Some(mut boxed_node) = self.take() {
                         {
@@ -288,32 +297,39 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
         *self = x;
     }
 
-    fn flip_colors(&mut self) {
-        let exchange_color : fn(&mut Box<Node<K, V>>) = |node| {
-            node.color = match &node.color {
-                &Colors::RED => Colors::BLACK,
-                &Colors::BLACK => Colors::RED,
-            };
-        };
-
+    fn flip_colors(&mut self, flip_type: FlipType) {
         self.as_mut().map(|node| {
-            exchange_color(node);
-            node.left.as_mut().map(exchange_color);
-            node.right.as_mut().map(exchange_color);
+            match flip_type {
+                FlipType::UP => {
+                    node.color = Colors::RED;
+                    node.left.as_mut().map(|left| left.color = Colors::BLACK);
+                    node.right.as_mut().map(|right| right.color = Colors::BLACK);
+                },
+                FlipType::DOWN => {
+                    node.color = Colors::BLACK;
+                    node.left.as_mut().map(|left| left.color = Colors::RED);
+                    node.right.as_mut().map(|right| right.color = Colors::RED);
+                }
+            }
         });
     }
 
     fn balance(&mut self) {
+        // 左偏红黑树，不存在右侧红节点
+
+        // h.right 为红色，执行左旋
         if ! self.left().is_red() && self.right().is_red() {
             self.rotate_left();
         }
 
+        // h.left 和 h.left.left 为红色，执行右旋
         if self.left().is_red() && self.left().left().is_red() {
             self.rotate_right();
         }
 
+        // h.left 和 h.right 为红色，分解 4 节点
         if self.left().is_red() && self.right().is_red() {
-            self.flip_colors();
+            self.flip_colors(FlipType::UP);
         }
 
         self.update_size();
@@ -337,19 +353,35 @@ impl<K: PartialOrd, V> LinkMethods<K, V> for Link<K, V> {
     }
 
     fn move_red_left(&mut self) {
-        self.flip_colors();
+        // 假设当前节点 h 为红色，h.right 和 h.right.left 为黑色
+        // 将 h.left 或者 h.left.left 变红
 
+        // Easy case: h.right.left is BLACK
+        // combine siblings
+        self.flip_colors(FlipType::DOWN);
+
+        // Harder case: h.right.left is RED
+        // borrow from siblings
         if self.right().left().is_red() {
             self.right_mut().rotate_right();
             self.rotate_left();
+            self.flip_colors(FlipType::UP);
         }
     }
 
     fn move_red_right(&mut self) {
-        self.flip_colors();
+        // 假设当前节点 h 为红色，h.left 和 h.left.left 为黑色
+        // 将 h.right 或者 h.right.right 变红
 
+        // Easy case: h.left.left is BLACK
+        // combine siblings
+        self.flip_colors(FlipType::DOWN);
+
+        // Harder case: h.left.left is RED
+        // borrow from siblings
         if self.left().left().is_red() {
             self.rotate_right();
+            self.flip_colors(FlipType::UP);
         }
     }
 
